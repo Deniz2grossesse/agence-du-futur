@@ -17,6 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { toast } from "sonner";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -33,6 +35,23 @@ const Register = () => {
         <Label htmlFor="job">Profession</Label>
         <Input id="job" type="text" placeholder="Développeur" />
       </div>
+      <div className="space-y-2">
+        <Label>Situation</Label>
+        <RadioGroup defaultValue="cdi">
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="cdi" id="cdi" />
+            <Label htmlFor="cdi">CDI</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="cdd" id="cdd" />
+            <Label htmlFor="cdd">CDD</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="freelance" id="freelance" />
+            <Label htmlFor="freelance">Freelance</Label>
+          </div>
+        </RadioGroup>
+      </div>
     </>
   );
 
@@ -46,6 +65,23 @@ const Register = () => {
         <Label htmlFor="siret">Numéro SIRET (si applicable)</Label>
         <Input id="siret" type="text" />
       </div>
+      <div className="space-y-2">
+        <Label>Type de bien principal</Label>
+        <RadioGroup defaultValue="apartment">
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="apartment" id="apartment" />
+            <Label htmlFor="apartment">Appartement</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="house" id="house" />
+            <Label htmlFor="house">Maison</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="commercial" id="commercial" />
+            <Label htmlFor="commercial">Local commercial</Label>
+          </div>
+        </RadioGroup>
+      </div>
     </>
   );
 
@@ -58,6 +94,23 @@ const Register = () => {
       <div className="space-y-2">
         <Label htmlFor="license">Numéro de carte professionnelle</Label>
         <Input id="license" type="text" />
+      </div>
+      <div className="space-y-2">
+        <Label>Spécialisation</Label>
+        <RadioGroup defaultValue="residential">
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="residential" id="residential" />
+            <Label htmlFor="residential">Résidentiel</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="commercial" id="commercial" />
+            <Label htmlFor="commercial">Commercial</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="luxury" id="luxury" />
+            <Label htmlFor="luxury">Luxe</Label>
+          </div>
+        </RadioGroup>
       </div>
     </>
   );
@@ -81,8 +134,31 @@ const Register = () => {
           </SelectContent>
         </Select>
       </div>
+      <div className="space-y-2">
+        <Label>Type de transport</Label>
+        <RadioGroup defaultValue="car">
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="car" id="car" />
+            <Label htmlFor="car">Voiture</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="motorcycle" id="motorcycle" />
+            <Label htmlFor="motorcycle">Moto/Scooter</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="public" id="public" />
+            <Label htmlFor="public">Transport en commun</Label>
+          </div>
+        </RadioGroup>
+      </div>
     </>
   );
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Inscription réussie !");
+    navigate("/auth/login");
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -91,12 +167,12 @@ const Register = () => {
           <CardTitle>Inscription</CardTitle>
           <CardDescription>
             {step === 1
-              ? "Créez votre compte en quelques étapes"
-              : "Complétez votre profil"}
+              ? "Choisissez votre type de profil"
+              : "Complétez vos informations"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {step === 1 ? (
               <>
                 <div className="space-y-2">
@@ -116,41 +192,39 @@ const Register = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nom complet</Label>
-                  <Input id="name" type="text" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Input id="password" type="password" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-                  <Input id="confirmPassword" type="password" />
-                </div>
-              </>
-            ) : (
-              <>
-                {userType === "tenant" && renderTenantFields()}
-                {userType === "owner" && renderOwnerFields()}
-                {userType === "agent" && renderAgentFields()}
-                {userType === "mobile-agent" && renderMobileAgentFields()}
-              </>
-            )}
-            <div className="flex flex-col space-y-4">
-              {step === 1 ? (
                 <Button
                   type="button"
                   onClick={() => userType && setStep(2)}
                   className="w-full"
+                  disabled={!userType}
                 >
                   Suivant
                 </Button>
-              ) : (
+              </>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nom complet</Label>
+                  <Input id="name" type="text" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Input id="password" type="password" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                  <Input id="confirmPassword" type="password" required />
+                </div>
+
+                {userType === "tenant" && renderTenantFields()}
+                {userType === "owner" && renderOwnerFields()}
+                {userType === "agent" && renderAgentFields()}
+                {userType === "mobile-agent" && renderMobileAgentFields()}
+
                 <div className="flex gap-4">
                   <Button
                     type="button"
@@ -164,15 +238,16 @@ const Register = () => {
                     S'inscrire
                   </Button>
                 </div>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/auth/login")}
-              >
-                Déjà inscrit ? Se connecter
-              </Button>
-            </div>
+              </>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/auth/login")}
+              className="w-full"
+            >
+              Déjà inscrit ? Se connecter
+            </Button>
           </form>
         </CardContent>
       </Card>
