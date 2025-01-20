@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Calendar, Home, MessageSquare, Users } from "lucide-react";
+import { Building2, Calendar, Home, MessageSquare, Users, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Sidebar = () => {
@@ -63,6 +63,20 @@ const Sidebar = () => {
             {expanded && <span className="ml-3">{item.name}</span>}
           </Link>
         ))}
+        
+        <Link
+          to="/auth/login"
+          className={cn(
+            "flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all mt-auto",
+            location.pathname === "/auth/login"
+              ? "bg-primary text-white"
+              : "hover:bg-gray-100",
+            !expanded && "justify-center"
+          )}
+        >
+          <LogIn className="w-6 h-6" />
+          {expanded && <span className="ml-3">Connexion</span>}
+        </Link>
       </nav>
     </div>
   );
