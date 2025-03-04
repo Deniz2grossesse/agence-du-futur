@@ -20,7 +20,7 @@ import {
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   
-  // Sample users data
+  // Updated users data with the correct roles
   const users = [
     { 
       id: 1, 
@@ -53,7 +53,7 @@ const Users = () => {
       id: 4, 
       name: "Sophie Martin", 
       email: "sophie.martin@example.com", 
-      role: "agent",
+      role: "agent-operator",
       properties: 12,
       status: "active",
       joinDate: "28/08/2022",
@@ -84,10 +84,10 @@ const Users = () => {
         return 'Locataire';
       case 'owner':
         return 'Propriétaire';
-      case 'agent':
-        return 'Agent immobilier';
+      case 'agent-operator':
+        return 'Agent Opérateur';
       case 'mobile-agent':
-        return 'Agent mobile';
+        return 'Agent Mobile';
       default:
         return role;
     }
@@ -137,7 +137,8 @@ const Users = () => {
                 <TabsTrigger value="all">Tous</TabsTrigger>
                 <TabsTrigger value="tenant">Locataires</TabsTrigger>
                 <TabsTrigger value="owner">Propriétaires</TabsTrigger>
-                <TabsTrigger value="agent">Agents</TabsTrigger>
+                <TabsTrigger value="agent-operator">Agents Opérateurs</TabsTrigger>
+                <TabsTrigger value="mobile-agent">Agents Mobiles</TabsTrigger>
               </TabsList>
             </Tabs>
           </CardHeader>

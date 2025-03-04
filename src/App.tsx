@@ -11,6 +11,7 @@ import Messages from "./pages/Messages";
 import Users from "./pages/Users";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Applications from "./pages/Applications";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/applications" element={<Applications />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/register" element={<Register />} />
         </Routes>

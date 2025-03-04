@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Calendar, Home, MessageSquare, Users, LogIn } from "lucide-react";
+import { Building2, Calendar, Home, MessageSquare, Users, LogIn, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -17,6 +17,7 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
     { name: "Calendar", icon: Calendar, path: "/calendar" },
     { name: "Messages", icon: MessageSquare, path: "/messages" },
     { name: "Users", icon: Users, path: "/users" },
+    { name: "Applications", icon: FileText, path: "/applications" },
   ];
 
   return (

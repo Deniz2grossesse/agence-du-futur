@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,19 @@ const Register = () => {
           </div>
         </RadioGroup>
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="lookingFor">Type de bien recherché</Label>
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez le type de bien" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="apartment">Appartement</SelectItem>
+            <SelectItem value="house">Maison</SelectItem>
+            <SelectItem value="studio">Studio</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </>
   );
 
@@ -85,7 +99,7 @@ const Register = () => {
     </>
   );
 
-  const renderAgentFields = () => (
+  const renderAgentOperatorFields = () => (
     <>
       <div className="space-y-2">
         <Label htmlFor="agency">Nom de l'agence</Label>
@@ -111,6 +125,10 @@ const Register = () => {
             <Label htmlFor="luxury">Luxe</Label>
           </div>
         </RadioGroup>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="managedProperties">Nombre de biens gérés</Label>
+        <Input id="managedProperties" type="number" placeholder="0" />
       </div>
     </>
   );
@@ -151,6 +169,19 @@ const Register = () => {
           </div>
         </RadioGroup>
       </div>
+      <div className="space-y-2">
+        <Label>Visites virtuelles</Label>
+        <RadioGroup defaultValue="yes">
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="yes" id="virtualYes" />
+            <Label htmlFor="virtualYes">Disponible</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="no" id="virtualNo" />
+            <Label htmlFor="virtualNo">Non disponible</Label>
+          </div>
+        </RadioGroup>
+      </div>
     </>
   );
 
@@ -187,7 +218,7 @@ const Register = () => {
                     <SelectContent>
                       <SelectItem value="tenant">Locataire</SelectItem>
                       <SelectItem value="owner">Propriétaire</SelectItem>
-                      <SelectItem value="agent">Agent Immobilier</SelectItem>
+                      <SelectItem value="agent-operator">Agent Opérateur</SelectItem>
                       <SelectItem value="mobile-agent">Agent Mobile</SelectItem>
                     </SelectContent>
                   </Select>
@@ -222,7 +253,7 @@ const Register = () => {
 
                 {userType === "tenant" && renderTenantFields()}
                 {userType === "owner" && renderOwnerFields()}
-                {userType === "agent" && renderAgentFields()}
+                {userType === "agent-operator" && renderAgentOperatorFields()}
                 {userType === "mobile-agent" && renderMobileAgentFields()}
 
                 <div className="flex gap-4">

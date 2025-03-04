@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -45,7 +46,7 @@ const Login = () => {
                 <SelectContent>
                   <SelectItem value="tenant">Locataire</SelectItem>
                   <SelectItem value="owner">Propriétaire</SelectItem>
-                  <SelectItem value="agent">Agent Immobilier</SelectItem>
+                  <SelectItem value="agent-operator">Agent Opérateur</SelectItem>
                   <SelectItem value="mobile-agent">Agent Mobile</SelectItem>
                 </SelectContent>
               </Select>
