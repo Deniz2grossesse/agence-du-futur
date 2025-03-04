@@ -1,5 +1,6 @@
+
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Calendar, Home, MessageSquare, Users, LogIn, FileText, UserCog, UserCircle, Car, LogOut, PieChart } from "lucide-react";
+import { Building2, Calendar, Home, MessageSquare, Users as UsersIcon, LogIn, FileText, UserCog, UserCircle, Car, LogOut, PieChart, User as UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -181,7 +182,7 @@ const getRoleIcon = (role: string) => {
     case 'tenant':
       return <UserCircle className="w-6 h-6 text-blue-500" />;
     default:
-      return <User className="w-6 h-6 text-gray-500" />;
+      return <UserIcon className="w-6 h-6 text-gray-500" />;
   }
 };
 
