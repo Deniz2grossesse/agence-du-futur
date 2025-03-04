@@ -15,6 +15,9 @@ export interface Visit {
   mobileAgentId?: number;
   mobileAgentName?: string;
   isAvailabilitySlot?: boolean;  // Indique si c'est un créneau de disponibilité d'agent mobile
+  automaticallyAssigned?: boolean; // Indique si la visite a été attribuée automatiquement
+  confirmationSent?: boolean; // Indique si la confirmation a été envoyée
+  reminderSent?: boolean; // Indique si le rappel a été envoyé
 }
 
 export interface AgentAvailability {
@@ -27,4 +30,8 @@ export interface AgentAvailability {
   status: 'available' | 'booked' | 'unavailable';
   recurrent?: boolean;
   recurrencePattern?: 'daily' | 'weekly' | 'monthly';
+  location?: { // Pour la géolocalisation de l'agent
+    latitude: number;
+    longitude: number;
+  };
 }

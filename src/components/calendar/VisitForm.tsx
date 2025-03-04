@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,17 +17,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Visit } from "@/types/visit";
+import { Visit, AgentAvailability } from "@/types/visit";
 import { useState } from "react";
+import { autoAssignAgentToVisit } from "@/utils/visitAssignment";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 interface VisitFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (visit: Partial<Visit>) => void;
   visit?: Visit;
+  availabilities?: AgentAvailability[];
 }
 
-const VisitForm = ({ isOpen, onClose, onSave, visit }: VisitFormProps) => {
+const VisitForm = ({ isOpen, onClose, onSave, visit, availabilities = [] }: VisitFormProps) => {
   const [formData, setFormData] = useState<Partial<Visit>>(
     visit || {
       propertyTitle: "",
@@ -44,6 +47,8 @@ const VisitForm = ({ isOpen, onClose, onSave, visit }: VisitFormProps) => {
     }
   );
 
+  const [useAutoAssign, setUseAutoAssign] = useState(!visit);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -57,7 +62,21 @@ const VisitForm = ({ isOpen, onClose, onSave, visit }: VisitFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    
+    if (useAutoAssign && availabilities.length > 0) {
+      const updatedVisit = autoAssignAgentToVisit(formData, availabilities);
+      
+      if (updatedVisit.mobileAgentId) {
+        toast.success(`Visite attribuée automatiquement à ${updatedVisit.mobileAgentName}`);
+        onSave(updatedVisit);
+      } else {
+        if (confirm("Aucun agent disponible pour cette visite. Souhaitez-vous quand même l'enregistrer?")) {
+          onSave(formData);
+        }
+      }
+    } else {
+      onSave(formData);
+    }
   };
 
   return (
@@ -186,6 +205,31 @@ const VisitForm = ({ isOpen, onClose, onSave, visit }: VisitFormProps) => {
                 </Select>
               </div>
             </div>
+
+            {!visit && (
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="autoAssign"
+                  checked={useAutoAssign}
+                  onCheckedChange={(checked) => setUseAutoAssign(checked === true)}
+                />
+                <Label htmlFor="autoAssign">
+                  Attribuer automatiquement à un agent disponible
+                </Label>
+              </div>
+            )}
+
+            {!useAutoAssign && (
+              <div className="space-y-2">
+                <Label htmlFor="mobileAgentName">Agent mobile</Label>
+                <Input
+                  id="mobileAgentName"
+                  name="mobileAgentName"
+                  value={formData.mobileAgentName || ""}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>

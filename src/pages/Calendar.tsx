@@ -1,22 +1,19 @@
 import Layout from "@/components/layout/Layout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addMonths, subMonths } from "date-fns";
 import { Visit, AgentAvailability } from "@/types/visit";
 import { toast } from "sonner";
 import CalendarHeader from "@/components/calendar/CalendarHeader";
 import CalendarGrid from "@/components/calendar/CalendarGrid";
-import VisitForm from "@/components/calendar/VisitForm";
-import VisitDetail from "@/components/calendar/VisitDetail";
 import AgentAvailabilityForm from "@/components/calendar/AgentAvailabilityForm";
 import { Button } from "@/components/ui/button";
+import VisitManager from "@/components/calendar/VisitManager";
+import { sendVisitNotifications } from "@/utils/visitAssignment";
 
 const Calendar = () => {
   // État pour gérer la date courante du calendrier
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [showVisitForm, setShowVisitForm] = useState(false);
   const [showAvailabilityForm, setShowAvailabilityForm] = useState(false);
-  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
-  const [editingVisit, setEditingVisit] = useState<Visit | null>(null);
   const [selectedAvailability, setSelectedAvailability] = useState<AgentAvailability | null>(null);
   const [editingAvailability, setEditingAvailability] = useState<AgentAvailability | null>(null);
   
@@ -96,6 +93,13 @@ const Calendar = () => {
     }
   ]);
 
+  // Effet pour envoyer des notifications automatiques pour les visites à venir
+  useEffect(() => {
+    // Mettre à jour les visites avec des notifications automatiques
+    const updatedVisits = visits.map(visit => sendVisitNotifications(visit));
+    setVisits(updatedVisits);
+  }, [currentDate]); // Se déclenche lorsque la date change
+
   // Fonctions pour naviguer entre les mois
   const handlePreviousMonth = () => {
     setCurrentDate(prev => subMonths(prev, 1));
@@ -111,53 +115,15 @@ const Calendar = () => {
     toast.info(`Mode changé: ${userRole === 'agent-operator' ? 'Agent Mobile' : 'Agent Opérateur'}`);
   };
 
-  // Gestion des visites
+  // Gestion des formulaires
   const handleAddVisit = () => {
-    setEditingVisit(null);
-    setShowVisitForm(true);
+    // Cette fonction est maintenant gérée par VisitManager
+    document.dispatchEvent(new CustomEvent('add-visit'));
   };
 
   const handleAddAvailability = () => {
     setEditingAvailability(null);
     setShowAvailabilityForm(true);
-  };
-
-  const handleVisitClick = (visit: Visit) => {
-    setSelectedVisit(visit);
-  };
-
-  const handleEditVisit = (visit: Visit) => {
-    setEditingVisit(visit);
-    setSelectedVisit(null);
-    setShowVisitForm(true);
-  };
-
-  const handleDeleteVisit = (visitId: number) => {
-    setVisits(prev => prev.filter(v => v.id !== visitId));
-    toast.success("Visite supprimée avec succès");
-  };
-
-  const handleSaveVisit = (visitData: Partial<Visit>) => {
-    if (editingVisit) {
-      // Mise à jour d'une visite existante
-      setVisits(prev => 
-        prev.map(v => v.id === editingVisit.id ? { ...v, ...visitData } : v)
-      );
-      toast.success("Visite mise à jour avec succès");
-    } else {
-      // Ajout d'une nouvelle visite
-      const newVisit: Visit = {
-        id: Math.max(0, ...visits.map(v => v.id)) + 1,
-        propertyId: Math.floor(Math.random() * 1000),
-        ...visitData,
-      } as Visit;
-      
-      setVisits(prev => [...prev, newVisit]);
-      toast.success("Nouvelle visite planifiée avec succès");
-    }
-    
-    setShowVisitForm(false);
-    setEditingVisit(null);
   };
 
   // Gestion des disponibilités
@@ -210,6 +176,11 @@ const Calendar = () => {
     ...getAvailabilitySlots()
   ];
 
+  // Filtrer les visites selon le rôle
+  const filteredVisits = userRole === 'mobile-agent' 
+    ? combinedVisitsAndAvailabilities.filter(v => v.isAvailabilitySlot || v.mobileAgentId === 1) 
+    : combinedVisitsAndAvailabilities;
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -233,18 +204,18 @@ const Calendar = () => {
         
         <CalendarGrid 
           currentDate={currentDate}
-          visits={userRole === 'mobile-agent' 
-            ? combinedVisitsAndAvailabilities.filter(v => v.isAvailabilitySlot || v.mobileAgentId === 1) 
-            : combinedVisitsAndAvailabilities}
-          onVisitClick={handleVisitClick}
+          visits={filteredVisits}
+          onVisitClick={(visit) => {
+            if (visit.isAvailabilitySlot) return;
+            document.dispatchEvent(new CustomEvent('visit-click', { detail: visit }));
+          }}
         />
         
-        {/* Modal de formulaire de visite */}
-        <VisitForm 
-          isOpen={showVisitForm}
-          onClose={() => setShowVisitForm(false)}
-          onSave={handleSaveVisit}
-          visit={editingVisit || undefined}
+        <VisitManager 
+          visits={visits}
+          availabilities={availabilities}
+          onVisitChange={setVisits}
+          userRole={userRole}
         />
         
         {/* Modal de formulaire de disponibilité */}
@@ -253,15 +224,6 @@ const Calendar = () => {
           onClose={() => setShowAvailabilityForm(false)}
           onSave={handleSaveAvailability}
           availability={editingAvailability || undefined}
-        />
-        
-        {/* Modal de détails de visite */}
-        <VisitDetail 
-          visit={selectedVisit}
-          isOpen={!!selectedVisit}
-          onClose={() => setSelectedVisit(null)}
-          onEdit={handleEditVisit}
-          onDelete={handleDeleteVisit}
         />
       </div>
     </Layout>
