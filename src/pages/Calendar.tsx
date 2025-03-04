@@ -1,4 +1,3 @@
-
 import Layout from "@/components/layout/Layout";
 import { useState } from "react";
 import { addMonths, subMonths } from "date-fns";
@@ -9,6 +8,7 @@ import CalendarGrid from "@/components/calendar/CalendarGrid";
 import VisitForm from "@/components/calendar/VisitForm";
 import VisitDetail from "@/components/calendar/VisitDetail";
 import AgentAvailabilityForm from "@/components/calendar/AgentAvailabilityForm";
+import { Button } from "@/components/ui/button";
 
 const Calendar = () => {
   // État pour gérer la date courante du calendrier
