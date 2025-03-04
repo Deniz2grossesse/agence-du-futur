@@ -1,167 +1,152 @@
 
-import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, MapPin, Plus, User } from "lucide-react";
+import { useState } from "react";
+import { addMonths, subMonths } from "date-fns";
+import { Visit } from "@/types/visit";
+import { toast } from "sonner";
+import CalendarHeader from "@/components/calendar/CalendarHeader";
+import CalendarGrid from "@/components/calendar/CalendarGrid";
+import VisitForm from "@/components/calendar/VisitForm";
+import VisitDetail from "@/components/calendar/VisitDetail";
 
 const Calendar = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  // État pour gérer la date courante du calendrier
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [showVisitForm, setShowVisitForm] = useState(false);
+  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
+  const [editingVisit, setEditingVisit] = useState<Visit | null>(null);
   
-  // Sample appointments data
-  const appointments = [
-    { 
-      id: 1, 
-      title: "Visite Appartement T3", 
-      time: "10:00 - 11:00",
-      address: "12 Rue de la Paix, 75001 Paris",
-      client: "Thomas Dubois",
-      type: "Visite"
+  // Données de démonstration pour les visites
+  const [visits, setVisits] = useState<Visit[]>([
+    {
+      id: 1,
+      propertyId: 101,
+      propertyTitle: "Appartement T3 Centre-ville",
+      propertyAddress: "15 rue Victor Hugo, 69002 Lyon",
+      clientName: "Sophie Martin",
+      clientEmail: "sophie.martin@example.com",
+      clientPhone: "06 12 34 56 78",
+      agentName: "Jean Dupont",
+      date: new Date().toISOString().split("T")[0], // Aujourd'hui
+      time: "14:30",
+      status: "confirmed",
+      notes: "Cliente intéressée par la vue sur le Rhône."
     },
-    { 
-      id: 2, 
-      title: "Signature Bail Studio", 
-      time: "14:00 - 15:00",
-      address: "5 Avenue Victor Hugo, 69003 Lyon",
-      client: "Marie Laurent",
-      type: "Signature"
+    {
+      id: 2,
+      propertyId: 102,
+      propertyTitle: "Maison avec jardin",
+      propertyAddress: "8 allée des Roses, 69005 Lyon",
+      clientName: "Thomas Dubois",
+      clientEmail: "thomas.dubois@example.com",
+      clientPhone: "07 65 43 21 09",
+      agentName: "Marie Laurent",
+      date: new Date().toISOString().split("T")[0], // Aujourd'hui
+      time: "10:00",
+      status: "scheduled",
+      notes: "Client recherche un jardin pour ses enfants."
     },
-    { 
-      id: 3, 
-      title: "État des lieux - Maison", 
-      time: "16:30 - 17:30",
-      address: "8 Rue des Fleurs, 44000 Nantes",
-      client: "Jean Dupont",
-      type: "État des lieux"
-    },
-  ];
+    {
+      id: 3,
+      propertyId: 103,
+      propertyTitle: "Studio meublé",
+      propertyAddress: "22 avenue Jean Jaurès, 69007 Lyon",
+      clientName: "Julie Petit",
+      clientEmail: "julie.petit@example.com",
+      clientPhone: "06 98 76 54 32",
+      agentName: "Jean Dupont",
+      date: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString().split("T")[0], // Dans 2 jours
+      time: "16:00",
+      status: "scheduled",
+      notes: "Étudiante à la recherche d'un logement proche du campus."
+    }
+  ]);
+
+  // Fonctions pour naviguer entre les mois
+  const handlePreviousMonth = () => {
+    setCurrentDate(prev => subMonths(prev, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(prev => addMonths(prev, 1));
+  };
+
+  // Gestion des visites
+  const handleAddVisit = () => {
+    setEditingVisit(null);
+    setShowVisitForm(true);
+  };
+
+  const handleVisitClick = (visit: Visit) => {
+    setSelectedVisit(visit);
+  };
+
+  const handleEditVisit = (visit: Visit) => {
+    setEditingVisit(visit);
+    setSelectedVisit(null);
+    setShowVisitForm(true);
+  };
+
+  const handleDeleteVisit = (visitId: number) => {
+    setVisits(prev => prev.filter(v => v.id !== visitId));
+    toast.success("Visite supprimée avec succès");
+  };
+
+  const handleSaveVisit = (visitData: Partial<Visit>) => {
+    if (editingVisit) {
+      // Mise à jour d'une visite existante
+      setVisits(prev => 
+        prev.map(v => v.id === editingVisit.id ? { ...v, ...visitData } : v)
+      );
+      toast.success("Visite mise à jour avec succès");
+    } else {
+      // Ajout d'une nouvelle visite
+      const newVisit: Visit = {
+        id: Math.max(0, ...visits.map(v => v.id)) + 1,
+        propertyId: Math.floor(Math.random() * 1000),
+        ...visitData,
+      } as Visit;
+      
+      setVisits(prev => [...prev, newVisit]);
+      toast.success("Nouvelle visite planifiée avec succès");
+    }
+    
+    setShowVisitForm(false);
+    setEditingVisit(null);
+  };
 
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Calendrier</h1>
-            <p className="text-muted-foreground">
-              Gérez vos rendez-vous et visites
-            </p>
-          </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Nouveau rendez-vous
-          </Button>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-[300px_1fr]">
-          <div className="space-y-6">
-            <Card>
-              <CardContent className="p-0">
-                <CalendarComponent
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  className="rounded-md border"
-                />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Légende</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-                  <span>Visite</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                  <span>Signature</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-amber-500"></div>
-                  <span>État des lieux</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="space-y-6">
-            <Card>
-              <CardHeader className="pb-0">
-                <Tabs defaultValue="day">
-                  <div className="flex justify-between items-center">
-                    <CardTitle>
-                      {date?.toLocaleDateString('fr-FR', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
-                    </CardTitle>
-                    <TabsList>
-                      <TabsTrigger value="day">Jour</TabsTrigger>
-                      <TabsTrigger value="week">Semaine</TabsTrigger>
-                      <TabsTrigger value="month">Mois</TabsTrigger>
-                    </TabsList>
-                  </div>
-                  <CardDescription className="mt-2">
-                    {appointments.length} rendez-vous aujourd'hui
-                  </CardDescription>
-                </Tabs>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <TabsContent value="day" className="m-0">
-                  <div className="space-y-4">
-                    {appointments.map((appointment) => (
-                      <Card key={appointment.id} className="overflow-hidden">
-                        <div className={`h-2 ${
-                          appointment.type === "Visite" ? "bg-blue-500" : 
-                          appointment.type === "Signature" ? "bg-green-500" : "bg-amber-500"
-                        }`}></div>
-                        <CardContent className="p-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <h3 className="font-semibold">{appointment.title}</h3>
-                            <div className="flex items-center text-sm">
-                              <Clock className="mr-1 h-4 w-4 text-muted-foreground" />
-                              <span>{appointment.time}</span>
-                            </div>
-                          </div>
-                          <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                            <div className="flex items-center">
-                              <MapPin className="mr-1 h-4 w-4" />
-                              <span>{appointment.address}</span>
-                            </div>
-                            <div className="flex items-center">
-                              <User className="mr-1 h-4 w-4" />
-                              <span>{appointment.client}</span>
-                            </div>
-                          </div>
-                          <div className="mt-4 flex justify-end gap-2">
-                            <Button variant="outline" size="sm">Modifier</Button>
-                            <Button size="sm">Détails</Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </TabsContent>
-                <TabsContent value="week" className="m-0">
-                  <div className="flex items-center justify-center h-[300px]">
-                    <p className="text-muted-foreground">Vue semaine à implémenter</p>
-                  </div>
-                </TabsContent>
-                <TabsContent value="month" className="m-0">
-                  <div className="flex items-center justify-center h-[300px]">
-                    <p className="text-muted-foreground">Vue mois à implémenter</p>
-                  </div>
-                </TabsContent>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        <CalendarHeader 
+          currentDate={currentDate}
+          onPreviousMonth={handlePreviousMonth}
+          onNextMonth={handleNextMonth}
+          onAddVisit={handleAddVisit}
+        />
+        
+        <CalendarGrid 
+          currentDate={currentDate}
+          visits={visits}
+          onVisitClick={handleVisitClick}
+        />
+        
+        {/* Modal de formulaire de visite */}
+        <VisitForm 
+          isOpen={showVisitForm}
+          onClose={() => setShowVisitForm(false)}
+          onSave={handleSaveVisit}
+          visit={editingVisit || undefined}
+        />
+        
+        {/* Modal de détails de visite */}
+        <VisitDetail 
+          visit={selectedVisit}
+          isOpen={!!selectedVisit}
+          onClose={() => setSelectedVisit(null)}
+          onEdit={handleEditVisit}
+          onDelete={handleDeleteVisit}
+        />
       </div>
     </Layout>
   );
