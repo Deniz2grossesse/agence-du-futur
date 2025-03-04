@@ -1,4 +1,3 @@
-
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -43,6 +42,8 @@ const Messages = () => {
                 />
               </div>
             </CardHeader>
+            
+            
             <ScrollArea className="flex-1">
               <CardContent className="p-0">
                 {contacts.map((contact) => (
@@ -80,6 +81,7 @@ const Messages = () => {
             </ScrollArea>
           </Card>
 
+          
           <Card className="h-full flex flex-col">
             <CardHeader className="px-6 py-4 border-b flex-shrink-0">
               <div className="flex items-center gap-3">
