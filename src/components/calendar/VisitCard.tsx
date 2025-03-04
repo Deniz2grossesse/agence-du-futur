@@ -2,7 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Visit } from "@/types/visit";
-import { Clock, Home, MapPin, User } from "lucide-react";
+import { Clock, Home, MapPin, User, Calendar } from "lucide-react";
 
 interface VisitCardProps {
   visit: Visit;
@@ -25,6 +25,34 @@ const VisitCard = ({ visit, onClick }: VisitCardProps) => {
     }
   };
 
+  // Affichage spécifique pour les créneaux de disponibilité
+  if (visit.isAvailabilitySlot) {
+    return (
+      <Card 
+        className="cursor-pointer hover:shadow-md transition-shadow bg-blue-50"
+        onClick={() => onClick(visit)}
+      >
+        <CardContent className="p-4">
+          <div className="flex justify-between items-start mb-2">
+            <div className="font-medium truncate mr-2">{visit.time}</div>
+            <Badge variant="outline" className="bg-blue-100">Disponibilité</Badge>
+          </div>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-muted-foreground" />
+              <span className="truncate">{visit.agentName}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="truncate">{visit.date}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Affichage standard pour les visites
   return (
     <Card 
       className="cursor-pointer hover:shadow-md transition-shadow"
@@ -48,10 +76,12 @@ const VisitCard = ({ visit, onClick }: VisitCardProps) => {
             <User className="h-4 w-4 text-muted-foreground" />
             <span className="truncate">{visit.clientName}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span>{visit.time}</span>
-          </div>
+          {visit.mobileAgentName && (
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-blue-500" />
+              <span className="truncate text-blue-500">{visit.mobileAgentName}</span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
