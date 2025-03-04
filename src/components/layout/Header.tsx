@@ -1,3 +1,4 @@
+
 import { Bell, Search, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -10,15 +11,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const Header = () => {
+interface HeaderProps {
+  sidebarExpanded: boolean;
+}
+
+const Header = ({ sidebarExpanded }: HeaderProps) => {
   return (
-    <header className="fixed top-0 right-0 z-30 w-[calc(100%-16rem)] h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between">
+    <header className={`fixed top-0 right-0 z-30 h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between transition-all duration-300 ${
+      sidebarExpanded ? "w-[calc(100%-16rem)]" : "w-[calc(100%-5rem)]"
+    }`}>
       <div className="flex items-center flex-1">
         <Search className="w-5 h-5 text-gray-400" />
         <Input
           type="search"
-          placeholder="Search..."
-          className="ml-2 w-64 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+          placeholder="Rechercher..."
+          className="ml-2 w-full max-w-xs bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
         />
       </div>
       
@@ -38,11 +45,11 @@ const Header = () => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Sign out</DropdownMenuItem>
+            <DropdownMenuItem>Profil</DropdownMenuItem>
+            <DropdownMenuItem>Paramètres</DropdownMenuItem>
+            <DropdownMenuItem>Déconnexion</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

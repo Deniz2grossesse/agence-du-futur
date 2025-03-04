@@ -1,11 +1,15 @@
-import { useState } from "react";
+
 import { Link, useLocation } from "react-router-dom";
 import { Building2, Calendar, Home, MessageSquare, Users, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const Sidebar = () => {
+interface SidebarProps {
+  expanded: boolean;
+  setExpanded: (expanded: boolean) => void;
+}
+
+const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
   const location = useLocation();
-  const [expanded, setExpanded] = useState(true);
 
   const navigation = [
     { name: "Dashboard", icon: Home, path: "/" },
