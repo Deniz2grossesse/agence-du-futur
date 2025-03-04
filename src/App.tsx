@@ -12,6 +12,10 @@ import Users from "./pages/Users";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Applications from "./pages/Applications";
+import TenantDashboard from "./pages/dashboards/TenantDashboard";
+import OwnerDashboard from "./pages/dashboards/OwnerDashboard";
+import AgentOperatorDashboard from "./pages/dashboards/AgentOperatorDashboard";
+import MobileAgentDashboard from "./pages/dashboards/MobileAgentDashboard";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +34,12 @@ const App = () => (
           <Route path="/applications" element={<Applications />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/register" element={<Register />} />
+          
+          {/* Routes des tableaux de bord spécifiques */}
+          <Route path="/dashboard/tenant" element={<TenantDashboard />} />
+          <Route path="/dashboard/owner" element={<OwnerDashboard />} />
+          <Route path="/dashboard/agent-operator" element={<AgentOperatorDashboard />} />
+          <Route path="/dashboard/mobile-agent" element={<MobileAgentDashboard />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

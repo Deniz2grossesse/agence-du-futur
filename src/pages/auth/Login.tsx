@@ -18,10 +18,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 const Login = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState("");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    toast.success(`Connexion réussie en tant que ${getUserTypeLabel(userType)}`);
+    
+    // Redirection vers le tableau de bord correspondant au type d'utilisateur
+    switch(userType) {
+      case "tenant":
+        navigate("/dashboard/tenant");
+        break;
+      case "owner":
+        navigate("/dashboard/owner");
+        break;
+      case "agent-operator":
+        navigate("/dashboard/agent-operator");
+        break;
+      case "mobile-agent":
+        navigate("/dashboard/mobile-agent");
+        break;
+      default:
+        navigate("/");
+    }
+  };
+
+  const getUserTypeLabel = (type: string) => {
+    switch(type) {
+      case 'tenant':
+        return 'Locataire';
+      case 'owner':
+        return 'Propriétaire';
+      case 'agent-operator':
+        return 'Agent Opérateur';
+      case 'mobile-agent':
+        return 'Agent Mobile';
+      default:
+        return type;
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -33,7 +73,7 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-2">
               <Label htmlFor="userType">Type d'utilisateur</Label>
               <Select
@@ -60,7 +100,7 @@ const Login = () => {
               <Input id="password" type="password" />
             </div>
             <div className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={!userType}>
                 Se connecter
               </Button>
               <Button
