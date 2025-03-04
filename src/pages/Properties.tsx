@@ -1,270 +1,286 @@
 
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Building, Home, MapPin, Euro, BarChart3, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Home, Plus, MapPin, Bed, Bath, Maximize, Eye, MessageSquare } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-
-// Sample properties data
-const properties = [
-  {
-    id: 1,
-    title: "Appartement T3 avec terrasse",
-    address: "12 Rue de la Paix, 75001 Paris",
-    price: 1250,
-    type: "Appartement",
-    bedrooms: 2,
-    bathrooms: 1,
-    surface: 68,
-    status: "Disponible",
-    img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-  },
-  {
-    id: 2,
-    title: "Studio lumineux proche métro",
-    address: "5 Avenue Victor Hugo, 69003 Lyon",
-    price: 590,
-    type: "Studio",
-    bedrooms: 1,
-    bathrooms: 1,
-    surface: 32,
-    status: "Disponible",
-    img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-  },
-  {
-    id: 3,
-    title: "Maison avec jardin",
-    address: "8 Rue des Fleurs, 44000 Nantes",
-    price: 1800,
-    type: "Maison",
-    bedrooms: 4,
-    bathrooms: 2,
-    surface: 120,
-    status: "Disponible",
-    img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-  },
-  {
-    id: 4,
-    title: "Appartement T2 rénové",
-    address: "3 Rue Saint-Dominique, 13001 Marseille",
-    price: 780,
-    type: "Appartement",
-    bedrooms: 1,
-    bathrooms: 1,
-    surface: 45,
-    status: "Réservé",
-    img: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-  },
-  {
-    id: 5,
-    title: "Loft industriel rénové",
-    address: "18 Quai des Chartrons, 33000 Bordeaux",
-    price: 1500,
-    type: "Loft",
-    bedrooms: 2,
-    bathrooms: 2,
-    surface: 85,
-    status: "Disponible",
-    img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-  },
-  {
-    id: 6,
-    title: "Appartement T4 avec vue",
-    address: "25 Boulevard Victor Hugo, 06000 Nice",
-    price: 1350,
-    type: "Appartement",
-    bedrooms: 3,
-    bathrooms: 2,
-    surface: 90,
-    status: "Disponible",
-    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-  },
-];
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Properties = () => {
-  const [view, setView] = useState<"grid" | "list">("grid");
-  
+  const [activeTab, setActiveTab] = useState("all");
+
+  // Sample data for properties
+  const properties = [
+    { id: 1, name: "Appartement T3", address: "21 Rue de la Paix, Paris 9e", type: "Apartment", status: "Available", price: 1200, area: 68 },
+    { id: 2, name: "Studio lumineux", address: "45 Avenue des Fleurs, Lyon 3e", type: "Studio", status: "Rented", price: 750, area: 32 },
+    { id: 3, name: "Villa Moderne", address: "8 Chemin des Oliviers, Nice", type: "House", status: "Available", price: 2100, area: 120 },
+    { id: 4, name: "Loft industriel", address: "12 Rue des Artisans, Bordeaux", type: "Loft", status: "Pending", price: 1500, area: 85 },
+    { id: 5, name: "Maison de ville", address: "3 Place du Marché, Toulouse", type: "House", status: "Available", price: 1800, area: 110 },
+  ];
+
+  // Sample data for chart
+  const chartData = [
+    { name: "Jan", available: 6, rented: 4, pending: 2 },
+    { name: "Feb", available: 5, rented: 6, pending: 1 },
+    { name: "Mar", available: 8, rented: 3, pending: 4 },
+    { name: "Apr", available: 7, rented: 5, pending: 2 },
+    { name: "May", available: 9, rented: 2, pending: 3 },
+    { name: "Jun", available: 11, rented: 3, pending: 1 },
+  ];
+
+  // Sample stats data
+  const stats = [
+    { title: "Biens", value: "38", icon: Building, description: "Total properties" },
+    { title: "Disponible", value: "24", icon: Home, description: "Available for rent" },
+    { title: "Taux d'occupation", value: "76%", icon: BarChart3, description: "Occupancy rate" },
+    { title: "Loyer moyen", value: "1280 €", icon: Euro, description: "Average rent" },
+  ];
+
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="space-y-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Biens immobiliers</h1>
+            <h1 className="text-3xl font-bold">Propriétés</h1>
             <p className="text-muted-foreground">
-              Gérez et consultez tous vos biens immobiliers
+              Gérez votre portefeuille immobilier
             </p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Ajouter un bien
-          </Button>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <Tabs defaultValue="all" className="w-full md:w-auto">
-            <TabsList>
-              <TabsTrigger value="all">Tous</TabsTrigger>
-              <TabsTrigger value="available">Disponibles</TabsTrigger>
-              <TabsTrigger value="rented">Loués</TabsTrigger>
-              <TabsTrigger value="reserved">Réservés</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          
-          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-            <div className="flex-1 sm:w-auto">
-              <Input placeholder="Rechercher un bien..." />
-            </div>
-            <Select defaultValue="all">
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Type de bien" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les types</SelectItem>
-                <SelectItem value="apartment">Appartement</SelectItem>
-                <SelectItem value="house">Maison</SelectItem>
-                <SelectItem value="studio">Studio</SelectItem>
-                <SelectItem value="loft">Loft</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex gap-2">
+            <Button variant="outline">
+              <Filter className="mr-2 h-4 w-4" />
+              Filtrer
+            </Button>
+            <Button>Ajouter une propriété</Button>
           </div>
         </div>
 
-        <TabsContent value="all" className="mt-0">
-          <div className={view === "grid" 
-            ? "grid gap-6 sm:grid-cols-2 lg:grid-cols-3" 
-            : "space-y-4"
-          }>
-            {properties.map((property) => (
-              <Card key={property.id} className={view === "list" ? "overflow-hidden" : ""}>
-                {view === "grid" ? (
-                  <>
-                    <div className="relative aspect-video overflow-hidden">
-                      <img 
-                        src={property.img} 
-                        alt={property.title}
-                        className="object-cover w-full h-full transition-transform hover:scale-105"
-                      />
-                      <Badge className="absolute top-2 right-2 bg-white text-black">
-                        {property.status}
-                      </Badge>
-                    </div>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-xl">{property.title}</CardTitle>
-                      <CardDescription className="flex items-center">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        {property.address}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="pb-2">
-                      <div className="flex justify-between items-center mb-4">
-                        <p className="text-2xl font-bold">{property.price} €/mois</p>
-                        <Badge variant="outline" className="flex items-center">
-                          {property.type === "Appartement" ? (
-                            <Building2 className="h-3 w-3 mr-1" />
-                          ) : (
-                            <Home className="h-3 w-3 mr-1" />
-                          )}
-                          {property.type}
-                        </Badge>
-                      </div>
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <div className="flex items-center">
-                          <Bed className="h-4 w-4 mr-1" />
-                          {property.bedrooms} ch.
-                        </div>
-                        <div className="flex items-center">
-                          <Bath className="h-4 w-4 mr-1" />
-                          {property.bathrooms} sdb.
-                        </div>
-                        <div className="flex items-center">
-                          <Maximize className="h-4 w-4 mr-1" />
-                          {property.surface} m²
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-1" />
-                        Détails
-                      </Button>
-                      <Button variant="secondary" size="sm">
-                        <MessageSquare className="h-4 w-4 mr-1" />
-                        Contact
-                      </Button>
-                    </CardFooter>
-                  </>
-                ) : (
-                  <div className="flex flex-col sm:flex-row">
-                    <div className="relative w-full sm:w-48 h-48">
-                      <img 
-                        src={property.img} 
-                        alt={property.title}
-                        className="object-cover w-full h-full"
-                      />
-                      <Badge className="absolute top-2 left-2 bg-white text-black">
-                        {property.status}
-                      </Badge>
-                    </div>
-                    <div className="flex-1 p-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <div>
-                          <h3 className="text-xl font-bold">{property.title}</h3>
-                          <p className="text-muted-foreground flex items-center text-sm">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            {property.address}
-                          </p>
-                        </div>
-                        <p className="text-xl font-bold">{property.price} €/mois</p>
-                      </div>
-                      <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                        <Badge variant="outline" className="flex items-center">
-                          {property.type === "Appartement" ? (
-                            <Building2 className="h-3 w-3 mr-1" />
-                          ) : (
-                            <Home className="h-3 w-3 mr-1" />
-                          )}
-                          {property.type}
-                        </Badge>
-                        <div className="flex items-center">
-                          <Bed className="h-4 w-4 mr-1" />
-                          {property.bedrooms} chambres
-                        </div>
-                        <div className="flex items-center">
-                          <Bath className="h-4 w-4 mr-1" />
-                          {property.bathrooms} salle{property.bathrooms > 1 ? 's' : ''} de bain
-                        </div>
-                        <div className="flex items-center">
-                          <Maximize className="h-4 w-4 mr-1" />
-                          {property.surface} m²
-                        </div>
-                      </div>
-                      <div className="mt-4 flex justify-end gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-1" />
-                          Détails
-                        </Button>
-                        <Button variant="secondary" size="sm">
-                          <MessageSquare className="h-4 w-4 mr-1" />
-                          Contact
-                        </Button>
-                      </div>
-                    </div>
+        {/* Stats Overview */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, index) => (
+            <Card key={index}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                    <p className="text-3xl font-bold">{stat.value}</p>
                   </div>
-                )}
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+                  <div className="rounded-full bg-primary/10 p-3">
+                    <stat.icon className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+                <p className="mt-4 text-xs text-muted-foreground">{stat.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Chart and Listings */}
+        <Tabs defaultValue="all" className="space-y-6" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="all">Tous les biens</TabsTrigger>
+            <TabsTrigger value="available">Disponibles</TabsTrigger>
+            <TabsTrigger value="rented">Loués</TabsTrigger>
+            <TabsTrigger value="pending">En attente</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="all" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Aperçu des propriétés</CardTitle>
+                <CardDescription>
+                  Distribution des propriétés par mois et par statut
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="available" stackId="a" fill="#4f46e5" name="Disponible" />
+                      <Bar dataKey="rented" stackId="a" fill="#16a34a" name="Loué" />
+                      <Bar dataKey="pending" stackId="a" fill="#f59e0b" name="En attente" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Liste des propriétés</CardTitle>
+                <CardDescription>
+                  Vue d'ensemble de votre portefeuille immobilier
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nom</TableHead>
+                      <TableHead>Adresse</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead className="text-right">Prix</TableHead>
+                      <TableHead className="text-right">Surface</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {properties.map((property) => (
+                      <TableRow key={property.id}>
+                        <TableCell className="font-medium">{property.name}</TableCell>
+                        <TableCell className="flex items-center">
+                          <MapPin className="mr-2 h-4 w-4 text-muted-foreground" /> 
+                          {property.address}
+                        </TableCell>
+                        <TableCell>{property.type}</TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            property.status === "Available" ? "outline" : 
+                            property.status === "Rented" ? "success" : 
+                            "warning"
+                          }>
+                            {property.status === "Available" ? "Disponible" : 
+                             property.status === "Rented" ? "Loué" : 
+                             "En attente"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">{property.price} €/mois</TableCell>
+                        <TableCell className="text-right">{property.area} m²</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="available" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Propriétés disponibles</CardTitle>
+                <CardDescription>
+                  Tous les biens actuellement disponibles à la location
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nom</TableHead>
+                      <TableHead>Adresse</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead className="text-right">Prix</TableHead>
+                      <TableHead className="text-right">Surface</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {properties
+                      .filter((property) => property.status === "Available")
+                      .map((property) => (
+                        <TableRow key={property.id}>
+                          <TableCell className="font-medium">{property.name}</TableCell>
+                          <TableCell className="flex items-center">
+                            <MapPin className="mr-2 h-4 w-4 text-muted-foreground" /> 
+                            {property.address}
+                          </TableCell>
+                          <TableCell>{property.type}</TableCell>
+                          <TableCell className="text-right">{property.price} €/mois</TableCell>
+                          <TableCell className="text-right">{property.area} m²</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="rented" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Propriétés louées</CardTitle>
+                <CardDescription>
+                  Tous les biens actuellement en location
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nom</TableHead>
+                      <TableHead>Adresse</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead className="text-right">Prix</TableHead>
+                      <TableHead className="text-right">Surface</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {properties
+                      .filter((property) => property.status === "Rented")
+                      .map((property) => (
+                        <TableRow key={property.id}>
+                          <TableCell className="font-medium">{property.name}</TableCell>
+                          <TableCell className="flex items-center">
+                            <MapPin className="mr-2 h-4 w-4 text-muted-foreground" /> 
+                            {property.address}
+                          </TableCell>
+                          <TableCell>{property.type}</TableCell>
+                          <TableCell className="text-right">{property.price} €/mois</TableCell>
+                          <TableCell className="text-right">{property.area} m²</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="pending" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Propriétés en attente</CardTitle>
+                <CardDescription>
+                  Tous les biens en cours de traitement
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nom</TableHead>
+                      <TableHead>Adresse</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead className="text-right">Prix</TableHead>
+                      <TableHead className="text-right">Surface</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {properties
+                      .filter((property) => property.status === "Pending")
+                      .map((property) => (
+                        <TableRow key={property.id}>
+                          <TableCell className="font-medium">{property.name}</TableCell>
+                          <TableCell className="flex items-center">
+                            <MapPin className="mr-2 h-4 w-4 text-muted-foreground" /> 
+                            {property.address}
+                          </TableCell>
+                          <TableCell>{property.type}</TableCell>
+                          <TableCell className="text-right">{property.price} €/mois</TableCell>
+                          <TableCell className="text-right">{property.area} m²</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );
