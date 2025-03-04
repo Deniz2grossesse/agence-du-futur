@@ -43,7 +43,7 @@ const Users = () => {
       id: 4, 
       name: "Sophie Martin", 
       email: "sophie.martin@example.com", 
-      role: "agent-operator",
+      role: "administrator",
       properties: 12,
       status: "active",
       joinDate: "28/08/2022",

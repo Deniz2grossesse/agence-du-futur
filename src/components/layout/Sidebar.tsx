@@ -1,9 +1,9 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Building2, Calendar, Home, MessageSquare, Users, LogIn, FileText, UserCog, UserCircle, Car, LogOut, PieChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { User } from "@/types/user";
 
 interface SidebarProps {
   expanded: boolean;
@@ -14,12 +14,10 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
 
-  // Navigation de base pour tous les utilisateurs
   const commonNavigation = [
     { name: "Dashboard", icon: Home, path: "/" },
   ];
 
-  // Navigation spécifique par rôle
   const roleBasedNavigation = () => {
     if (!user) return [];
 
@@ -57,7 +55,6 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
     }
   };
 
-  // Combiner la navigation
   const navigation = isAuthenticated 
     ? [...commonNavigation, ...roleBasedNavigation()]
     : commonNavigation;
