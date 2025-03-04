@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -10,16 +11,57 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const MobileAgentFormFields = () => {
+interface MobileAgentFormFieldsProps {
+  onChange: (data: any) => void;
+}
+
+const MobileAgentFormFields = ({ onChange }: MobileAgentFormFieldsProps) => {
+  const [agentData, setAgentData] = useState({
+    zone: "",
+    availability: "full",
+    transportType: "car",
+    virtualVisitAvailable: true
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setAgentData({ ...agentData, [id]: value });
+  };
+
+  const handleSelectChange = (value: string) => {
+    setAgentData({ ...agentData, availability: value });
+  };
+
+  const handleTransportChange = (value: string) => {
+    setAgentData({ ...agentData, transportType: value });
+  };
+
+  const handleVirtualVisitChange = (value: string) => {
+    setAgentData({ ...agentData, virtualVisitAvailable: value === "yes" });
+  };
+
+  useEffect(() => {
+    onChange(agentData);
+  }, [agentData, onChange]);
+
   return (
     <>
-      <div className="space-y-2">
+      <div className="space-y-2 mb-4">
         <Label htmlFor="zone">Zone géographique</Label>
-        <Input id="zone" type="text" placeholder="Paris" />
+        <Input 
+          id="zone" 
+          type="text" 
+          placeholder="Paris" 
+          value={agentData.zone}
+          onChange={handleChange}
+        />
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2 mb-4">
         <Label htmlFor="availability">Disponibilités</Label>
-        <Select>
+        <Select 
+          value={agentData.availability}
+          onValueChange={handleSelectChange}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Choisir vos disponibilités" />
           </SelectTrigger>
@@ -30,9 +72,12 @@ const MobileAgentFormFields = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2 mb-4">
         <Label>Type de transport</Label>
-        <RadioGroup defaultValue="car">
+        <RadioGroup 
+          value={agentData.transportType}
+          onValueChange={handleTransportChange}
+        >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="car" id="car" />
             <Label htmlFor="car">Voiture</Label>
@@ -47,9 +92,12 @@ const MobileAgentFormFields = () => {
           </div>
         </RadioGroup>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2 mb-4">
         <Label>Visites virtuelles</Label>
-        <RadioGroup defaultValue="yes">
+        <RadioGroup 
+          value={agentData.virtualVisitAvailable ? "yes" : "no"}
+          onValueChange={handleVirtualVisitChange}
+        >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="yes" id="virtualYes" />
             <Label htmlFor="virtualYes">Disponible</Label>

@@ -1,7 +1,9 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Calendar, Home, MessageSquare, Users, LogIn, FileText } from "lucide-react";
+import { Building2, Calendar, Home, MessageSquare, Users, LogIn, FileText, UserCog, UserCircle, Car, LogOut, PieChart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 interface SidebarProps {
   expanded: boolean;
@@ -10,15 +12,55 @@ interface SidebarProps {
 
 const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
   const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
 
-  const navigation = [
+  // Navigation de base pour tous les utilisateurs
+  const commonNavigation = [
     { name: "Dashboard", icon: Home, path: "/" },
-    { name: "Properties", icon: Building2, path: "/properties" },
-    { name: "Calendar", icon: Calendar, path: "/calendar" },
-    { name: "Messages", icon: MessageSquare, path: "/messages" },
-    { name: "Users", icon: Users, path: "/users" },
-    { name: "Applications", icon: FileText, path: "/applications" },
   ];
+
+  // Navigation spécifique par rôle
+  const roleBasedNavigation = () => {
+    if (!user) return [];
+
+    switch (user.role) {
+      case "administrator":
+        return [
+          { name: "Biens", icon: Building2, path: "/properties" },
+          { name: "Calendrier", icon: Calendar, path: "/calendar" },
+          { name: "Messages", icon: MessageSquare, path: "/messages" },
+          { name: "Utilisateurs", icon: Users, path: "/users" },
+          { name: "Dossiers", icon: FileText, path: "/applications" },
+          { name: "Statistiques", icon: PieChart, path: "/statistics" },
+        ];
+      case "mobile-agent":
+        return [
+          { name: "Visites", icon: Calendar, path: "/calendar" },
+          { name: "Messages", icon: MessageSquare, path: "/messages" },
+        ];
+      case "owner":
+        return [
+          { name: "Mes Biens", icon: Building2, path: "/properties" },
+          { name: "Visites", icon: Calendar, path: "/calendar" },
+          { name: "Messages", icon: MessageSquare, path: "/messages" },
+          { name: "Documents", icon: FileText, path: "/documents" },
+        ];
+      case "tenant":
+        return [
+          { name: "Recherche", icon: Building2, path: "/properties" },
+          { name: "Visites", icon: Calendar, path: "/calendar" },
+          { name: "Messages", icon: MessageSquare, path: "/messages" },
+          { name: "Dossiers", icon: FileText, path: "/applications" },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  // Combiner la navigation
+  const navigation = isAuthenticated 
+    ? [...commonNavigation, ...roleBasedNavigation()]
+    : commonNavigation;
 
   return (
     <div
@@ -68,23 +110,82 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
             {expanded && <span className="ml-3">{item.name}</span>}
           </Link>
         ))}
-        
-        <Link
-          to="/auth/login"
-          className={cn(
-            "flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all mt-auto",
-            location.pathname === "/auth/login"
-              ? "bg-primary text-white"
-              : "hover:bg-gray-100",
-            !expanded && "justify-center"
-          )}
-        >
-          <LogIn className="w-6 h-6" />
-          {expanded && <span className="ml-3">Connexion</span>}
-        </Link>
       </nav>
+
+      <div className="p-4 border-t border-gray-200">
+        {isAuthenticated ? (
+          <div className="flex flex-col space-y-2">
+            {expanded && user && (
+              <div className="mb-2">
+                <div className="flex items-center space-x-2">
+                  {getRoleIcon(user.role)}
+                  <div>
+                    <p className="font-medium text-sm">{user.name}</p>
+                    <p className="text-xs text-gray-500">{getRoleFrenchLabel(user.role)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <Button
+              variant="outline"
+              onClick={logout}
+              className={cn(
+                "flex items-center",
+                !expanded && "justify-center"
+              )}
+            >
+              <LogOut className="w-5 h-5" />
+              {expanded && <span className="ml-2">Déconnexion</span>}
+            </Button>
+          </div>
+        ) : (
+          <Link
+            to="/auth/login"
+            className={cn(
+              "flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all mt-auto",
+              location.pathname === "/auth/login"
+                ? "bg-primary text-white"
+                : "hover:bg-gray-100",
+              !expanded && "justify-center"
+            )}
+          >
+            <LogIn className="w-6 h-6" />
+            {expanded && <span className="ml-3">Connexion</span>}
+          </Link>
+        )}
+      </div>
     </div>
   );
+};
+
+const getRoleFrenchLabel = (role: string): string => {
+  switch(role) {
+    case 'administrator':
+      return 'Administrateur';
+    case 'mobile-agent':
+      return 'Agent Mobile';
+    case 'owner':
+      return 'Propriétaire';
+    case 'tenant':
+      return 'Locataire';
+    default:
+      return role;
+  }
+};
+
+const getRoleIcon = (role: string) => {
+  switch(role) {
+    case 'administrator':
+      return <UserCog className="w-6 h-6 text-purple-500" />;
+    case 'mobile-agent':
+      return <Car className="w-6 h-6 text-orange-500" />;
+    case 'owner':
+      return <Building2 className="w-6 h-6 text-green-500" />;
+    case 'tenant':
+      return <UserCircle className="w-6 h-6 text-blue-500" />;
+    default:
+      return <User className="w-6 h-6 text-gray-500" />;
+  }
 };
 
 export default Sidebar;

@@ -18,34 +18,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
+import { UserRole } from "@/types/user";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [userType, setUserType] = useState("");
+  const [userType, setUserType] = useState<UserRole | "">("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login, isLoading } = useAuth();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    toast.success(`Connexion réussie en tant que ${getUserTypeLabel(userType)}`);
-    
-    // Redirection vers le tableau de bord correspondant au type d'utilisateur
-    switch(userType) {
-      case "tenant":
-        navigate("/dashboard/tenant");
-        break;
-      case "owner":
-        navigate("/dashboard/owner");
-        break;
-      case "agent-operator":
-        navigate("/dashboard/agent-operator");
-        break;
-      case "mobile-agent":
-        navigate("/dashboard/mobile-agent");
-        break;
-      default:
-        navigate("/");
+    if (!userType) {
+      alert("Veuillez sélectionner un type d'utilisateur");
+      return;
     }
+    
+    login(email, password, userType);
   };
 
   const getUserTypeLabel = (type: string) => {
@@ -54,8 +46,8 @@ const Login = () => {
         return 'Locataire';
       case 'owner':
         return 'Propriétaire';
-      case 'agent-operator':
-        return 'Agent Opérateur';
+      case 'administrator':
+        return 'Administrateur (Agent sur site)';
       case 'mobile-agent':
         return 'Agent Mobile';
       default:
@@ -78,7 +70,7 @@ const Login = () => {
               <Label htmlFor="userType">Type d'utilisateur</Label>
               <Select
                 value={userType}
-                onValueChange={setUserType}
+                onValueChange={(value) => setUserType(value as UserRole)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez votre profil" />
@@ -86,27 +78,52 @@ const Login = () => {
                 <SelectContent>
                   <SelectItem value="tenant">Locataire</SelectItem>
                   <SelectItem value="owner">Propriétaire</SelectItem>
-                  <SelectItem value="agent-operator">Agent Opérateur</SelectItem>
+                  <SelectItem value="administrator">Administrateur (Agent sur site)</SelectItem>
                   <SelectItem value="mobile-agent">Agent Mobile</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="exemple@email.com" />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="exemple@email.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
-              <Input id="password" type="password" />
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
             <div className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full" disabled={!userType}>
-                Se connecter
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={!userType || isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connexion en cours...
+                  </>
+                ) : (
+                  "Se connecter"
+                )}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => navigate("/auth/register")}
+                disabled={isLoading}
               >
                 Créer un compte
               </Button>

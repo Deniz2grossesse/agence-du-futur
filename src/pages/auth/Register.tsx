@@ -8,17 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { toast } from "sonner";
 import RegisterForm from "@/components/auth/RegisterForm";
 
 const Register = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState("");
-  const [step, setStep] = useState(1);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Inscription réussie !");
+  const handleLogin = () => {
     navigate("/auth/login");
   };
 
@@ -28,20 +24,15 @@ const Register = () => {
         <CardHeader>
           <CardTitle>Inscription</CardTitle>
           <CardDescription>
-            {step === 1
-              ? "Choisissez votre type de profil"
-              : "Complétez vos informations"}
+            Créez votre compte pour accéder à la plateforme
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <RegisterForm
-              userType={userType}
-              setUserType={setUserType}
-              onSubmit={handleSubmit}
-              onLogin={() => navigate("/auth/login")}
-            />
-          </form>
+          <RegisterForm
+            userType={userType}
+            setUserType={setUserType}
+            onLogin={handleLogin}
+          />
         </CardContent>
       </Card>
     </div>
