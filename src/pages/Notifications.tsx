@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { 
@@ -27,7 +26,11 @@ import {
   MessageSquare,
   ClipboardList,
   Shield,
-  Eye
+  Eye,
+  Droplet,
+  Thermometer,
+  Lock,
+  Home
 } from "lucide-react";
 
 const Notifications = () => {
@@ -39,7 +42,6 @@ const Notifications = () => {
     incident: "all"
   });
 
-  // Tenant notifications by type
   const tenantNotifications = {
     "rental-file": [
       { 
@@ -115,7 +117,6 @@ const Notifications = () => {
     ]
   };
 
-  // Owner notifications by type
   const ownerNotifications = {
     "owner-file": [
       { 
@@ -173,7 +174,6 @@ const Notifications = () => {
     ]
   };
 
-  // Banking/Insurance notifications by type
   const bankingNotifications = {
     "administrative-request": [
       { 
@@ -231,33 +231,80 @@ const Notifications = () => {
     ]
   };
 
-  // Incident notifications
-  const incidentNotifications = [
-    { 
-      id: 1, 
-      title: "Dégât des eaux signalé", 
-      description: "Un dégât des eaux a été signalé au 123 Rue de Paris, 2ème étage.",
-      time: "Il y a 30 minutes",
-      type: "error",
-      read: false
-    },
-    { 
-      id: 2, 
-      title: "Intervention programmée", 
-      description: "Un plombier interviendra demain entre 9h et 11h pour réparer la fuite.",
-      time: "Il y a 2 heures",
-      type: "warning",
-      read: false
-    },
-    { 
-      id: 3, 
-      title: "Incident résolu", 
-      description: "Le problème électrique au 45 Avenue Victor Hugo a été résolu.",
-      time: "Il y a 5 jours",
-      type: "success",
-      read: true
-    },
-  ];
+  const incidentNotifications = {
+    "water-damage": [
+      { 
+        id: 1, 
+        title: "Dégât des eaux signalé", 
+        description: "Un dégât des eaux a été signalé au 123 Rue de Paris, 2ème étage.",
+        time: "Il y a 30 minutes",
+        type: "error",
+        read: false
+      },
+      { 
+        id: 2, 
+        title: "Fuite de canalisation", 
+        description: "Fuite détectée dans la salle de bain de l'appartement 3B.",
+        time: "Il y a 2 heures",
+        type: "error",
+        read: false
+      },
+    ],
+    "heating-electricity": [
+      { 
+        id: 3, 
+        title: "Panne de chauffage", 
+        description: "Le chauffage ne fonctionne plus dans l'immeuble du 45 Avenue Victor Hugo.",
+        time: "Il y a 4 heures",
+        type: "error",
+        read: false
+      },
+      {
+        id: 4,
+        title: "Coupure électrique",
+        description: "Coupure électrique signalée au 2ème étage, un technicien a été contacté.",
+        time: "Il y a 1 jour",
+        type: "warning",
+        read: true
+      }
+    ],
+    "security-access": [
+      {
+        id: 5,
+        title: "Porte d'entrée endommagée",
+        description: "La porte d'entrée de l'immeuble ne ferme plus correctement.",
+        time: "Il y a 1 jour",
+        type: "warning",
+        read: false
+      },
+      {
+        id: 6,
+        title: "Problème d'interphone",
+        description: "L'interphone ne fonctionne plus pour les appartements 5 à 8.",
+        time: "Il y a 3 jours",
+        type: "warning",
+        read: true
+      }
+    ],
+    "maintenance-repairs": [
+      {
+        id: 7,
+        title: "Intervention plombier planifiée",
+        description: "Un plombier interviendra demain entre 9h et 11h pour réparer la fuite.",
+        time: "Il y a 2 heures",
+        type: "info",
+        read: false
+      },
+      {
+        id: 8,
+        title: "Réparation terminée",
+        description: "Le problème électrique au 45 Avenue Victor Hugo a été résolu.",
+        time: "Il y a 5 jours",
+        type: "success",
+        read: true
+      }
+    ]
+  };
 
   const renderIcon = (type) => {
     switch (type) {
@@ -459,6 +506,65 @@ const Notifications = () => {
     </div>
   );
 
+  const getIncidentTypeIcon = (type) => {
+    switch (type) {
+      case "water-damage":
+        return <Droplet className="h-5 w-5 text-blue-500" />;
+      case "heating-electricity":
+        return <Thermometer className="h-5 w-5 text-red-500" />;
+      case "security-access":
+        return <Lock className="h-5 w-5 text-amber-500" />;
+      case "maintenance-repairs":
+        return <Wrench className="h-5 w-5 text-green-500" />;
+      default:
+        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+    }
+  };
+
+  const getIncidentFilters = () => (
+    <div className="flex flex-wrap gap-2 mb-4">
+      <Button 
+        variant={notificationFilters.incident === "all" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "all"})}
+      >
+        Tous
+      </Button>
+      <Button 
+        variant={notificationFilters.incident === "water-damage" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "water-damage"})}
+        className="flex items-center gap-1"
+      >
+        <Droplet className="h-4 w-4" /> Dégât des eaux
+      </Button>
+      <Button 
+        variant={notificationFilters.incident === "heating-electricity" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "heating-electricity"})}
+        className="flex items-center gap-1"
+      >
+        <Thermometer className="h-4 w-4" /> Chauffage/Électricité
+      </Button>
+      <Button 
+        variant={notificationFilters.incident === "security-access" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "security-access"})}
+        className="flex items-center gap-1"
+      >
+        <Lock className="h-4 w-4" /> Sécurité/Accès
+      </Button>
+      <Button 
+        variant={notificationFilters.incident === "maintenance-repairs" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "maintenance-repairs"})}
+        className="flex items-center gap-1"
+      >
+        <Wrench className="h-4 w-4" /> Maintenance/Réparations
+      </Button>
+    </div>
+  );
+
   const getFilteredTenantNotifications = () => {
     if (notificationFilters.tenant === "all") {
       return [
@@ -493,6 +599,19 @@ const Notifications = () => {
       ];
     } else {
       return bankingNotifications[notificationFilters.banking] || [];
+    }
+  };
+
+  const getFilteredIncidentNotifications = () => {
+    if (notificationFilters.incident === "all") {
+      return [
+        ...incidentNotifications["water-damage"],
+        ...incidentNotifications["heating-electricity"],
+        ...incidentNotifications["security-access"],
+        ...incidentNotifications["maintenance-repairs"]
+      ];
+    } else {
+      return incidentNotifications[notificationFilters.incident] || [];
     }
   };
 
@@ -542,6 +661,26 @@ const Notifications = () => {
     return renderIcon(item.type);
   };
 
+  const getIncidentTypeLabel = (item) => {
+    if (incidentNotifications["water-damage"].find(n => n.id === item.id)) return "Dégât des eaux";
+    if (incidentNotifications["heating-electricity"].find(n => n.id === item.id)) return "Chauffage/Électricité";
+    if (incidentNotifications["security-access"].find(n => n.id === item.id)) return "Sécurité/Accès";
+    if (incidentNotifications["maintenance-repairs"].find(n => n.id === item.id)) return "Maintenance/Réparations";
+    return "";
+  };
+
+  const getIncidentNotificationIcon = (item) => {
+    if (incidentNotifications["water-damage"].find(n => n.id === item.id)) 
+      return getIncidentTypeIcon("water-damage");
+    if (incidentNotifications["heating-electricity"].find(n => n.id === item.id)) 
+      return getIncidentTypeIcon("heating-electricity");
+    if (incidentNotifications["security-access"].find(n => n.id === item.id)) 
+      return getIncidentTypeIcon("security-access");
+    if (incidentNotifications["maintenance-repairs"].find(n => n.id === item.id)) 
+      return getIncidentTypeIcon("maintenance-repairs");
+    return renderIcon(item.type);
+  };
+
   const countUnreadNotifications = (category) => {
     if (category === "tenant") {
       return getFilteredTenantNotifications().filter(n => !n.read).length;
@@ -553,6 +692,10 @@ const Notifications = () => {
       return incidentNotifications.filter(n => !n.read).length;
     }
     return 0;
+  };
+
+  const countIncidentsByType = (type) => {
+    return incidentNotifications[type] ? incidentNotifications[type].length : 0;
   };
 
   return (
@@ -596,7 +739,7 @@ const Notifications = () => {
               <AlertTriangle className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Incident</span>
               <Badge className="ml-2 bg-blue-500" variant="default">
-                {incidentNotifications.filter(n => !n.read).length}
+                {getFilteredIncidentNotifications().filter(n => !n.read).length}
               </Badge>
             </TabsTrigger>
           </TabsList>
@@ -759,39 +902,108 @@ const Notifications = () => {
                   <CardTitle>Notifications {getTabTitle("incident")}</CardTitle>
                 </div>
                 <CardDescription>
-                  {incidentNotifications.length} notifications, dont {countUnreadNotifications("incident")} non lues
+                  {getFilteredIncidentNotifications().length} notifications, dont {countUnreadNotifications("incident")} non lues
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {incidentNotifications.map((notification) => (
-                  <div 
-                    key={notification.id} 
-                    className={`flex items-start justify-between p-4 border rounded-lg ${notification.read ? 'bg-white' : 'bg-blue-50'}`}
-                  >
-                    <div className="flex gap-4">
-                      <div className="mt-1">
-                        {renderIcon(notification.type)}
+              <CardContent>
+                {getIncidentFilters()}
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-2">
+                        <Droplet className="h-4 w-4 text-blue-500" />
+                        <CardTitle className="text-sm font-medium">Dégâts des eaux</CardTitle>
                       </div>
-                      <div>
-                        <div className="flex items-center">
-                          <p className="font-medium">{notification.title}</p>
-                          {!notification.read && (
-                            <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800">
-                              Nouveau
-                            </Badge>
-                          )}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{countIncidentsByType("water-damage")}</div>
+                      <p className="text-xs text-muted-foreground">
+                        {incidentNotifications["water-damage"].filter(n => !n.read).length} non traités
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-2">
+                        <Thermometer className="h-4 w-4 text-red-500" />
+                        <CardTitle className="text-sm font-medium">Chauffage/Électricité</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{countIncidentsByType("heating-electricity")}</div>
+                      <p className="text-xs text-muted-foreground">
+                        {incidentNotifications["heating-electricity"].filter(n => !n.read).length} non traités
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-2">
+                        <Lock className="h-4 w-4 text-amber-500" />
+                        <CardTitle className="text-sm font-medium">Sécurité/Accès</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{countIncidentsByType("security-access")}</div>
+                      <p className="text-xs text-muted-foreground">
+                        {incidentNotifications["security-access"].filter(n => !n.read).length} non traités
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-2">
+                        <Wrench className="h-4 w-4 text-green-500" />
+                        <CardTitle className="text-sm font-medium">Maintenance/Réparations</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{countIncidentsByType("maintenance-repairs")}</div>
+                      <p className="text-xs text-muted-foreground">
+                        {incidentNotifications["maintenance-repairs"].filter(n => !n.read).length} non traités
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <div className="space-y-4">
+                  {getFilteredIncidentNotifications().map((notification) => (
+                    <div 
+                      key={notification.id} 
+                      className={`flex items-start justify-between p-4 border rounded-lg ${notification.read ? 'bg-white' : 'bg-blue-50'}`}
+                    >
+                      <div className="flex gap-4">
+                        <div className="mt-1">
+                          {getIncidentNotificationIcon(notification)}
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">{notification.description}</p>
-                        <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
+                        <div>
+                          <div className="flex items-center flex-wrap">
+                            <p className="font-medium">{notification.title}</p>
+                            {!notification.read && (
+                              <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800">
+                                Nouveau
+                              </Badge>
+                            )}
+                            <Badge variant="outline" className="ml-2 text-xs">
+                              {getIncidentTypeLabel(notification)}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">{notification.description}</p>
+                          <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
