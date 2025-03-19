@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,8 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, UserPlus, Mail, Phone, Home, Clock } from "lucide-react";
-import { useState } from "react";
+import { 
+  Search, Filter, UserPlus, Mail, Phone, 
+  Home, Clock, Eye, Send, FileText
+} from "lucide-react";
+import TenantDetail from "@/components/tenants/TenantDetail";
 
 // Données factices pour les locataires
 const tenants = [
@@ -20,7 +24,31 @@ const tenants = [
     phone: "06 12 34 56 78",
     email: "sophie.martin@example.com",
     moveInDate: "15/03/2023",
-    lastPayment: "01/09/2023"
+    lastPayment: "01/09/2023",
+    personalInfo: {
+      age: 34,
+      job: "Ingénieure informatique",
+      income: "3800€/mois",
+      guarantor: "Caution bancaire",
+      identityDoc: "Carte d'identité valide jusqu'au 12/05/2028"
+    },
+    payments: [
+      { id: 1, date: "01/09/2023", amount: 1200, status: "payé", method: "Virement" },
+      { id: 2, date: "01/08/2023", amount: 1200, status: "payé", method: "Virement" },
+      { id: 3, date: "01/07/2023", amount: 1200, status: "payé", method: "Virement" },
+      { id: 4, date: "01/06/2023", amount: 1200, status: "retard", method: "Chèque" },
+      { id: 5, date: "01/05/2023", amount: 1200, status: "payé", method: "Virement" }
+    ],
+    tickets: [
+      { id: 1, date: "15/07/2023", title: "Problème de chauffage", status: "résolu" },
+      { id: 2, date: "02/05/2023", title: "Fuite robinet cuisine", status: "résolu" }
+    ],
+    documents: [
+      { id: 1, name: "Contrat de bail", type: "pdf", signed: true, date: "15/03/2023" },
+      { id: 2, name: "État des lieux entrée", type: "pdf", signed: true, date: "15/03/2023" },
+      { id: 3, name: "Assurance habitation", type: "pdf", signed: true, date: "20/03/2023" },
+      { id: 4, name: "Quittance Août 2023", type: "pdf", signed: false, date: "01/08/2023" }
+    ]
   },
   {
     id: 2,
@@ -31,7 +59,28 @@ const tenants = [
     phone: "06 23 45 67 89",
     email: "thomas.dubois@example.com",
     moveInDate: "10/08/2022",
-    lastPayment: "28/08/2023"
+    lastPayment: "28/08/2023",
+    personalInfo: {
+      age: 27,
+      job: "Designer freelance",
+      income: "2600€/mois",
+      guarantor: "Parents",
+      identityDoc: "Passeport valide jusqu'au 18/11/2026"
+    },
+    payments: [
+      { id: 1, date: "28/08/2023", amount: 750, status: "payé", method: "Virement" },
+      { id: 2, date: "30/07/2023", amount: 750, status: "payé", method: "Virement" },
+      { id: 3, date: "02/07/2023", amount: 750, status: "retard", method: "Espèces" }
+    ],
+    tickets: [
+      { id: 1, date: "22/06/2023", title: "Volet roulant bloqué", status: "résolu" }
+    ],
+    documents: [
+      { id: 1, name: "Contrat de bail", type: "pdf", signed: true, date: "10/08/2022" },
+      { id: 2, name: "État des lieux entrée", type: "pdf", signed: true, date: "10/08/2022" },
+      { id: 3, name: "Préavis de départ", type: "pdf", signed: true, date: "15/08/2023" },
+      { id: 4, name: "Quittance Août 2023", type: "pdf", signed: true, date: "30/08/2023" }
+    ]
   },
   {
     id: 3,
@@ -42,7 +91,26 @@ const tenants = [
     phone: "06 34 56 78 90",
     email: "emma.petit@example.com",
     moveInDate: "01/06/2023",
-    lastPayment: "02/09/2023"
+    lastPayment: "02/09/2023",
+    personalInfo: {
+      age: 42,
+      job: "Médecin",
+      income: "5500€/mois",
+      guarantor: "Aucun",
+      identityDoc: "Carte d'identité valide jusqu'au 05/12/2025"
+    },
+    payments: [
+      { id: 1, date: "02/09/2023", amount: 1900, status: "payé", method: "Virement" },
+      { id: 2, date: "01/08/2023", amount: 1900, status: "payé", method: "Virement" },
+      { id: 3, date: "01/07/2023", amount: 1900, status: "payé", method: "Virement" },
+      { id: 4, date: "01/06/2023", amount: 1900, status: "payé", method: "Virement" }
+    ],
+    tickets: [],
+    documents: [
+      { id: 1, name: "Contrat de bail", type: "pdf", signed: true, date: "01/06/2023" },
+      { id: 2, name: "État des lieux entrée", type: "pdf", signed: true, date: "01/06/2023" },
+      { id: 3, name: "Assurance habitation", type: "pdf", signed: true, date: "05/06/2023" }
+    ]
   },
   {
     id: 4,
@@ -53,7 +121,26 @@ const tenants = [
     phone: "06 45 67 89 01",
     email: "lucas.moreau@example.com", 
     moveInDate: "20/01/2023",
-    lastPayment: "31/08/2023"
+    lastPayment: "31/08/2023",
+    personalInfo: {
+      age: 38,
+      job: "Architecte",
+      income: "4200€/mois",
+      guarantor: "Aucun",
+      identityDoc: "Carte d'identité valide jusqu'au 14/03/2027"
+    },
+    payments: [
+      { id: 1, date: "31/08/2023", amount: 1500, status: "payé", method: "Virement" },
+      { id: 2, date: "01/08/2023", amount: 1500, status: "payé", method: "Virement" }
+    ],
+    tickets: [
+      { id: 1, date: "10/06/2023", title: "Problème électrique", status: "en cours" },
+      { id: 2, date: "05/03/2023", title: "Peinture écaillée", status: "résolu" }
+    ],
+    documents: [
+      { id: 1, name: "Contrat de bail", type: "pdf", signed: true, date: "20/01/2023" },
+      { id: 2, name: "État des lieux entrée", type: "pdf", signed: true, date: "20/01/2023" }
+    ]
   },
   {
     id: 5,
@@ -64,7 +151,26 @@ const tenants = [
     phone: "06 56 78 90 12",
     email: "chloe.roux@example.com",
     moveInDate: "05/05/2022",
-    lastPayment: "25/08/2023"
+    lastPayment: "25/08/2023",
+    personalInfo: {
+      age: 31,
+      job: "Professeure",
+      income: "2300€/mois",
+      guarantor: "Parents",
+      identityDoc: "Passeport valide jusqu'au 22/07/2028"
+    },
+    payments: [
+      { id: 1, date: "25/08/2023", amount: 850, status: "payé", method: "Virement" },
+      { id: 2, date: "29/07/2023", amount: 850, status: "payé", method: "Chèque" }
+    ],
+    tickets: [
+      { id: 1, date: "17/08/2023", title: "Problème de serrure", status: "résolu" }
+    ],
+    documents: [
+      { id: 1, name: "Contrat de bail", type: "pdf", signed: true, date: "05/05/2022" },
+      { id: 2, name: "État des lieux entrée", type: "pdf", signed: true, date: "05/05/2022" },
+      { id: 3, name: "Préavis de départ", type: "pdf", signed: true, date: "10/08/2023" }
+    ]
   }
 ];
 
@@ -72,6 +178,7 @@ const Tenants = () => {
   const [activeTab, setActiveTab] = useState("liste");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("tous");
+  const [selectedTenant, setSelectedTenant] = useState<any>(null);
 
   // Filtrer les locataires selon la recherche et le filtre de statut
   const filteredTenants = tenants.filter(tenant => {
@@ -81,13 +188,25 @@ const Tenants = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // Fonctions pour gérer les actions
+  const handleViewDetails = (tenant: any) => {
+    setSelectedTenant(tenant);
+    setActiveTab("detail");
+  };
+
+  const handlePaymentReminder = (tenant: any) => {
+    // Dans une application réelle, ceci ouvrirait une modale
+    // ou naviguerait vers un formulaire de message
+    alert(`Relance de paiement pour ${tenant.name}`);
+  };
+
   // Rendu des badges de statut
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "en place":
-        return <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">En place</Badge>;
+        return <Badge variant="outline" className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">En place</Badge>;
       case "préavis":
-        return <Badge variant="outline" className="bg-orange-50 text-orange-700 hover:bg-orange-50 border-orange-200">Préavis</Badge>;
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200">Préavis</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -109,10 +228,10 @@ const Tenants = () => {
           </Button>
         </div>
 
-        <Tabs defaultValue="liste" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="liste">Liste des locataires</TabsTrigger>
-            <TabsTrigger value="detail" disabled={true}>Détail locataire</TabsTrigger>
+            <TabsTrigger value="detail" disabled={!selectedTenant}>Détail locataire</TabsTrigger>
           </TabsList>
           
           <TabsContent value="liste" className="space-y-6">
@@ -175,8 +294,22 @@ const Tenants = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
-                              <Button variant="outline" size="sm">Détails</Button>
-                              <Button variant="outline" size="sm">Quittance</Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleViewDetails(tenant)}
+                              >
+                                <Eye className="mr-1 h-4 w-4" />
+                                Voir
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handlePaymentReminder(tenant)}
+                              >
+                                <Send className="mr-1 h-4 w-4" />
+                                Relancer
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -235,6 +368,29 @@ const Tenants = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="detail">
+            {selectedTenant && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold">
+                    Détail de {selectedTenant.name}
+                    <span className="ml-2">
+                      {getStatusBadge(selectedTenant.status)}
+                    </span>
+                  </h2>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setActiveTab("liste")}
+                  >
+                    Retour à la liste
+                  </Button>
+                </div>
+                
+                <TenantDetail tenant={selectedTenant} />
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
