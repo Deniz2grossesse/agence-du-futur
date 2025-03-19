@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Calendar, Home, MessageSquare, Users as UsersIcon, LogIn, FileText, UserCog, UserCircle, Car, LogOut, PieChart, User as UserIcon } from "lucide-react";
+import { Building2, Calendar, Home, MessageSquare, UsersIcon, LogIn, FileText, UserCog, UserCircle, Car, LogOut, PieChart, UserIcon, Bell, MailOpen, Building } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,9 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
 
   const commonNavigation = [
     { name: "Dashboard", icon: Home, path: "/" },
+    { name: "Bien locatif", icon: Building, path: "/rental-properties" },
+    { name: "Notifications", icon: Bell, path: "/notifications" },
+    { name: "E-mail", icon: MailOpen, path: "/email" },
   ];
 
   const roleBasedNavigation = () => {

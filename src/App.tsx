@@ -21,6 +21,11 @@ import AgentOperatorDashboard from "./pages/dashboards/AgentOperatorDashboard";
 import MobileAgentDashboard from "./pages/dashboards/MobileAgentDashboard";
 import AccessDenied from "./pages/AccessDenied";
 
+// Nouvelles pages temporaires pour les nouvelles routes
+const RentalProperties = () => <div className="p-8"><h1 className="text-2xl font-bold">Biens locatifs</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
+const Notifications = () => <div className="p-8"><h1 className="text-2xl font-bold">Notifications</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
+const Email = () => <div className="p-8"><h1 className="text-2xl font-bold">E-mail</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -36,6 +41,11 @@ const App = () => (
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />
             <Route path="/access-denied" element={<AccessDenied />} />
+            
+            {/* Nouvelles routes */}
+            <Route path="/rental-properties" element={<RentalProperties />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/email" element={<Email />} />
 
             {/* Routes protégées pour tous les utilisateurs authentifiés */}
             <Route element={<ProtectedRoute allowedRoles={['administrator', 'mobile-agent', 'owner', 'tenant']} />}>
