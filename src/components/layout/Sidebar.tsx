@@ -39,13 +39,22 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
     ? mainNavigation.filter(item => {
         if (!user) return false;
         
-        // Certaines routes sont spécifiques à des rôles
+        // Si l'utilisateur est un locataire, lui donner un accès limité
+        if (user.role === 'tenant') {
+          // Les locataires ne voient que leur dashboard, les propriétés à louer, 
+          // leurs documents, le calendrier pour les visites, les notifications et les emails
+          return ["/", "/rental-properties", "/documents", "/calendar", "/notifications", "/email"].includes(item.path);
+        }
+        
+        // Pour les autres rôles, appliquer les filtres existants
         switch (item.path) {
           case "/settings":
           case "/users":
             return user.role === 'administrator';
           case "/owners":
             return user.role === 'administrator' || user.role === 'mobile-agent';
+          case "/tenants":
+            return user.role === 'administrator' || user.role === 'mobile-agent' || user.role === 'owner';
           default:
             return true;
         }

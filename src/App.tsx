@@ -70,18 +70,20 @@ const App = () => (
             <Route path="/create-maintenance-ticket/:id" element={<UnderDevelopment pageName="Créer un ticket de maintenance" />} />
             <Route path="/create-lease/:id" element={<UnderDevelopment pageName="Générer un bail" />} />
 
-            {/* Nouvelles routes selon l'arborescence du site */}
-            <Route path="/tenants" element={<Tenants />} />
-            <Route path="/payments" element={<Payments />} />
-            <Route path="/maintenance" element={<Maintenance />} />
-            <Route path="/documents" element={<Documents />} />
-            <Route path="/owners" element={<Owners />} />
-            <Route path="/settings" element={<Settings />} />
+            {/* Routes pour les professionnels uniquement (admin, agents, propriétaires) */}
+            <Route element={<ProtectedRoute allowedRoles={['administrator', 'mobile-agent', 'owner']} />}>
+              <Route path="/tenants" element={<Tenants />} />
+              <Route path="/payments" element={<Payments />} />
+              <Route path="/maintenance" element={<Maintenance />} />
+              <Route path="/owners" element={<Owners />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
 
             {/* Routes protégées pour tous les utilisateurs authentifiés */}
             <Route element={<ProtectedRoute allowedRoles={['administrator', 'mobile-agent', 'owner', 'tenant']} />}>
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/messages" element={<Messages />} />
+              <Route path="/documents" element={<Documents />} />
             </Route>
 
             {/* Routes pour Administrateur (Agent Opérateur) */}
@@ -110,7 +112,7 @@ const App = () => (
               <Route path="/applications" element={<Applications />} />
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={['administrator', 'owner', 'tenant']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['administrator', 'owner']} />}>
               <Route path="/properties" element={<Properties />} />
             </Route>
           </Routes>

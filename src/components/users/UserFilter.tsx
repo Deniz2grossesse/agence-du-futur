@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import { CardDescription, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UserFilterProps {
   totalUsers: number;
@@ -11,6 +12,9 @@ interface UserFilterProps {
 }
 
 const UserFilter = ({ totalUsers, searchTerm, onSearchChange }: UserFilterProps) => {
+  const { user } = useAuth();
+  const isTenant = user && user.role === 'tenant';
+
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -32,10 +36,11 @@ const UserFilter = ({ totalUsers, searchTerm, onSearchChange }: UserFilterProps)
       <Tabs defaultValue="all" className="mt-2">
         <TabsList>
           <TabsTrigger value="all">Tous</TabsTrigger>
-          <TabsTrigger value="tenant">Locataires</TabsTrigger>
-          <TabsTrigger value="owner">Propriétaires</TabsTrigger>
-          <TabsTrigger value="agent-operator">Agents Opérateurs</TabsTrigger>
-          <TabsTrigger value="mobile-agent">Agents Mobiles</TabsTrigger>
+          {/* Les locataires ne peuvent voir que les locataires */}
+          {!isTenant && <TabsTrigger value="tenant">Locataires</TabsTrigger>}
+          {!isTenant && <TabsTrigger value="owner">Propriétaires</TabsTrigger>}
+          {!isTenant && <TabsTrigger value="agent-operator">Agents Opérateurs</TabsTrigger>}
+          {!isTenant && <TabsTrigger value="mobile-agent">Agents Mobiles</TabsTrigger>}
         </TabsList>
       </Tabs>
     </>
