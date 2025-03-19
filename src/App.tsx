@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 import Index from "./pages/Index";
 import Properties from "./pages/Properties";
+import RentalProperties from "./pages/RentalProperties";
 import Calendar from "./pages/Calendar";
 import Messages from "./pages/Messages";
 import Users from "./pages/Users";
@@ -23,7 +24,6 @@ import AccessDenied from "./pages/AccessDenied";
 import Notifications from "./pages/Notifications";
 
 // Nouvelles pages temporaires pour les nouvelles routes
-const RentalProperties = () => <div className="p-8"><h1 className="text-2xl font-bold">Biens locatifs</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
 const Email = () => <div className="p-8"><h1 className="text-2xl font-bold">E-mail</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
 
 const queryClient = new QueryClient();
