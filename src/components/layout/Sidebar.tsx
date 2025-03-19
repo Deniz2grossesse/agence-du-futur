@@ -1,5 +1,10 @@
+
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Calendar, Home, MessageSquare, UsersIcon, LogIn, FileText, UserCog, UserCircle, Car, LogOut, PieChart, UserIcon, Bell, MailOpen, Building } from "lucide-react";
+import { 
+  Building2, Calendar, Home, MessageSquare, UsersIcon, LogIn, FileText, 
+  UserCog, UserCircle, Car, LogOut, PieChart, UserIcon, Bell, MailOpen, 
+  Building, DollarSign, Wrench, Settings, FileUp, Users
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -14,53 +19,38 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
 
-  const commonNavigation = [
+  // Structure complète de la navigation selon l'arborescence demandée
+  const mainNavigation = [
     { name: "Dashboard", icon: Home, path: "/" },
-    { name: "Bien locatif", icon: Building, path: "/rental-properties" },
+    { name: "Biens Locatifs", icon: Building, path: "/rental-properties" },
+    { name: "Locataires", icon: Users, path: "/tenants" },
+    { name: "Paiements", icon: DollarSign, path: "/payments" },
+    { name: "Travaux & Maintenance", icon: Wrench, path: "/maintenance" },
+    { name: "Planning", icon: Calendar, path: "/calendar" },
+    { name: "Documents", icon: FileText, path: "/documents" },
+    { name: "Propriétaires", icon: Building2, path: "/owners" },
+    { name: "Paramètres", icon: Settings, path: "/settings" },
     { name: "Notifications", icon: Bell, path: "/notifications" },
     { name: "E-mail", icon: MailOpen, path: "/email" },
   ];
 
-  const roleBasedNavigation = () => {
-    if (!user) return [];
-
-    switch (user.role) {
-      case "administrator":
-        return [
-          { name: "Biens", icon: Building2, path: "/properties" },
-          { name: "Calendrier", icon: Calendar, path: "/calendar" },
-          { name: "Messages", icon: MessageSquare, path: "/messages" },
-          { name: "Utilisateurs", icon: UsersIcon, path: "/users" },
-          { name: "Dossiers", icon: FileText, path: "/applications" },
-          { name: "Statistiques", icon: PieChart, path: "/statistics" },
-        ];
-      case "mobile-agent":
-        return [
-          { name: "Visites", icon: Calendar, path: "/calendar" },
-          { name: "Messages", icon: MessageSquare, path: "/messages" },
-        ];
-      case "owner":
-        return [
-          { name: "Mes Biens", icon: Building2, path: "/properties" },
-          { name: "Visites", icon: Calendar, path: "/calendar" },
-          { name: "Messages", icon: MessageSquare, path: "/messages" },
-          { name: "Documents", icon: FileText, path: "/documents" },
-        ];
-      case "tenant":
-        return [
-          { name: "Recherche", icon: Building2, path: "/properties" },
-          { name: "Visites", icon: Calendar, path: "/calendar" },
-          { name: "Messages", icon: MessageSquare, path: "/messages" },
-          { name: "Dossiers", icon: FileText, path: "/applications" },
-        ];
-      default:
-        return [];
-    }
-  };
-
-  const navigation = isAuthenticated 
-    ? [...commonNavigation, ...roleBasedNavigation()]
-    : commonNavigation;
+  // Filtrer la navigation en fonction du rôle utilisateur
+  const filteredNavigation = isAuthenticated 
+    ? mainNavigation.filter(item => {
+        if (!user) return false;
+        
+        // Certaines routes sont spécifiques à des rôles
+        switch (item.path) {
+          case "/settings":
+          case "/users":
+            return user.role === 'administrator';
+          case "/owners":
+            return user.role === 'administrator' || user.role === 'mobile-agent';
+          default:
+            return true;
+        }
+      })
+    : mainNavigation.filter(item => ["/", "/rental-properties", "/notifications", "/email"].includes(item.path));
 
   return (
     <div
@@ -93,8 +83,8 @@ const Sidebar = ({ expanded, setExpanded }: SidebarProps) => {
         </button>
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
-        {navigation.map((item) => (
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        {filteredNavigation.map((item) => (
           <Link
             key={item.name}
             to={item.path}

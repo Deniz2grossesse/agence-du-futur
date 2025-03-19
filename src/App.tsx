@@ -23,8 +23,23 @@ import MobileAgentDashboard from "./pages/dashboards/MobileAgentDashboard";
 import AccessDenied from "./pages/AccessDenied";
 import Notifications from "./pages/Notifications";
 
-// Nouvelles pages temporaires pour les nouvelles routes
-const Email = () => <div className="p-8"><h1 className="text-2xl font-bold">E-mail</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
+// Nouvelles pages dans le plan du site
+import Tenants from "./pages/Tenants";
+import Payments from "./pages/Payments";
+import Maintenance from "./pages/Maintenance";
+import Documents from "./pages/Documents";
+import Owners from "./pages/Owners";
+import Settings from "./pages/Settings";
+
+// Page temporaire pour les routes en développement
+const UnderDevelopment = ({ pageName }: { pageName: string }) => (
+  <div className="p-8">
+    <h1 className="text-2xl font-bold">{pageName}</h1>
+    <p className="mt-4">Cette page est en cours de développement.</p>
+  </div>
+);
+
+const Email = () => <UnderDevelopment pageName="E-mail" />;
 
 const queryClient = new QueryClient();
 
@@ -42,10 +57,18 @@ const App = () => (
             <Route path="/auth/register" element={<Register />} />
             <Route path="/access-denied" element={<AccessDenied />} />
             
-            {/* Nouvelles routes */}
+            {/* Routes accessibles à tous */}
             <Route path="/rental-properties" element={<RentalProperties />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/email" element={<Email />} />
+
+            {/* Nouvelles routes selon l'arborescence du site */}
+            <Route path="/tenants" element={<Tenants />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/maintenance" element={<Maintenance />} />
+            <Route path="/documents" element={<Documents />} />
+            <Route path="/owners" element={<Owners />} />
+            <Route path="/settings" element={<Settings />} />
 
             {/* Routes protégées pour tous les utilisateurs authentifiés */}
             <Route element={<ProtectedRoute allowedRoles={['administrator', 'mobile-agent', 'owner', 'tenant']} />}>
