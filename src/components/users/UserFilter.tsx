@@ -16,13 +16,13 @@ const UserFilter = ({ totalUsers, searchTerm, onSearchChange }: UserFilterProps)
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <CardTitle>Tous les utilisateurs</CardTitle>
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Rechercher..."
             className="pl-8"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
+            startIcon={<Search className="h-4 w-4" />}
           />
         </div>
       </div>
