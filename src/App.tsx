@@ -23,6 +23,7 @@ import AgentOperatorDashboard from "./pages/dashboards/AgentOperatorDashboard";
 import MobileAgentDashboard from "./pages/dashboards/MobileAgentDashboard";
 import AccessDenied from "./pages/AccessDenied";
 import Notifications from "./pages/Notifications";
+import Email from "./pages/Email";
 
 // Nouvelles pages dans le plan du site
 import Tenants from "./pages/Tenants";
@@ -39,8 +40,6 @@ const UnderDevelopment = ({ pageName }: { pageName: string }) => (
     <p className="mt-4">Cette page est en cours de développement.</p>
   </div>
 );
-
-const Email = () => <UnderDevelopment pageName="E-mail" />;
 
 const queryClient = new QueryClient();
 
@@ -62,8 +61,7 @@ const App = () => (
             <Route path="/rental-properties" element={<RentalProperties />} />
             <Route path="/rental-property/:id" element={<PropertyDetail />} />
             <Route path="/notifications" element={<Notifications />} />
-            <Route path="/email" element={<Email />} />
-
+            
             {/* Routes de développement */}
             <Route path="/edit-property/:id" element={<UnderDevelopment pageName="Modifier le bien" />} />
             <Route path="/add-property" element={<UnderDevelopment pageName="Ajouter un bien" />} />
@@ -84,6 +82,7 @@ const App = () => (
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/documents" element={<Documents />} />
+              <Route path="/email" element={<Email />} />
             </Route>
 
             {/* Routes pour Administrateur (Agent Opérateur) */}
