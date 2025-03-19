@@ -10,6 +10,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Properties from "./pages/Properties";
 import RentalProperties from "./pages/RentalProperties";
+import PropertyDetail from "./pages/PropertyDetail";
 import Calendar from "./pages/Calendar";
 import Messages from "./pages/Messages";
 import Users from "./pages/Users";
@@ -59,8 +60,15 @@ const App = () => (
             
             {/* Routes accessibles à tous */}
             <Route path="/rental-properties" element={<RentalProperties />} />
+            <Route path="/rental-property/:id" element={<PropertyDetail />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/email" element={<Email />} />
+
+            {/* Routes de développement */}
+            <Route path="/edit-property/:id" element={<UnderDevelopment pageName="Modifier le bien" />} />
+            <Route path="/add-property" element={<UnderDevelopment pageName="Ajouter un bien" />} />
+            <Route path="/create-maintenance-ticket/:id" element={<UnderDevelopment pageName="Créer un ticket de maintenance" />} />
+            <Route path="/create-lease/:id" element={<UnderDevelopment pageName="Générer un bail" />} />
 
             {/* Nouvelles routes selon l'arborescence du site */}
             <Route path="/tenants" element={<Tenants />} />
