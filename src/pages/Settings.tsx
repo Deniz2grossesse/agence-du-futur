@@ -1,4 +1,3 @@
-
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -343,33 +342,33 @@ const Settings = () => {
                   <div>
                     <h3 className="text-md font-medium mb-2">Propriétaire</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      <code className="bg-muted p-1 rounded">{{owner_name}}</code>
-                      <code className="bg-muted p-1 rounded">{{owner_address}}</code>
-                      <code className="bg-muted p-1 rounded">{{owner_email}}</code>
-                      <code className="bg-muted p-1 rounded">{{owner_phone}}</code>
-                      <code className="bg-muted p-1 rounded">{{owner_tax_number}}</code>
+                      <code className="bg-muted p-1 rounded">{"{{owner_name}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{owner_address}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{owner_email}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{owner_phone}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{owner_tax_number}}"}</code>
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="text-md font-medium mb-2">Locataire</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      <code className="bg-muted p-1 rounded">{{tenant_name}}</code>
-                      <code className="bg-muted p-1 rounded">{{tenant_address}}</code>
-                      <code className="bg-muted p-1 rounded">{{tenant_email}}</code>
-                      <code className="bg-muted p-1 rounded">{{tenant_phone}}</code>
+                      <code className="bg-muted p-1 rounded">{"{{tenant_name}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{tenant_address}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{tenant_email}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{tenant_phone}}"}</code>
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="text-md font-medium mb-2">Bien</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      <code className="bg-muted p-1 rounded">{{property_address}}</code>
-                      <code className="bg-muted p-1 rounded">{{property_type}}</code>
-                      <code className="bg-muted p-1 rounded">{{property_surface}}</code>
-                      <code className="bg-muted p-1 rounded">{{property_rooms}}</code>
-                      <code className="bg-muted p-1 rounded">{{rent_amount}}</code>
-                      <code className="bg-muted p-1 rounded">{{charges_amount}}</code>
+                      <code className="bg-muted p-1 rounded">{"{{property_address}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{property_type}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{property_surface}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{property_rooms}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{rent_amount}}"}</code>
+                      <code className="bg-muted p-1 rounded">{"{{charges_amount}}"}</code>
                     </div>
                   </div>
                 </div>
@@ -801,3 +800,4 @@ const Settings = () => {
 };
 
 export default Settings;
+

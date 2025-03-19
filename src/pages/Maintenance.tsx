@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, Plus, Wrench, Tool, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { Search, Filter, Plus, Wrench, Clock, CheckCircle, AlertCircle, Settings } from "lucide-react";
 import { useState } from "react";
 
 // Types d'incidents et de travaux
@@ -276,7 +276,7 @@ const Maintenance = () => {
                   <p className="text-3xl font-bold">1 170 €</p>
                 </div>
                 <div className="rounded-full bg-primary/10 p-3">
-                  <Tool className="h-6 w-6 text-primary" />
+                  <Settings className="h-6 w-6 text-primary" />
                 </div>
               </div>
             </CardContent>
