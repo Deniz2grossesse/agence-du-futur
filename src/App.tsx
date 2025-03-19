@@ -20,10 +20,10 @@ import OwnerDashboard from "./pages/dashboards/OwnerDashboard";
 import AgentOperatorDashboard from "./pages/dashboards/AgentOperatorDashboard";
 import MobileAgentDashboard from "./pages/dashboards/MobileAgentDashboard";
 import AccessDenied from "./pages/AccessDenied";
+import Notifications from "./pages/Notifications";
 
 // Nouvelles pages temporaires pour les nouvelles routes
 const RentalProperties = () => <div className="p-8"><h1 className="text-2xl font-bold">Biens locatifs</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
-const Notifications = () => <div className="p-8"><h1 className="text-2xl font-bold">Notifications</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
 const Email = () => <div className="p-8"><h1 className="text-2xl font-bold">E-mail</h1><p className="mt-4">Cette page est en cours de développement.</p></div>;
 
 const queryClient = new QueryClient();
