@@ -6,8 +6,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Download, Filter, DollarSign, RefreshCw, FileText, Building2 } from "lucide-react";
-import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Search, Download, Filter, DollarSign, RefreshCw, FileText, Building2, Check, AlertTriangle, Send, Calendar } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 // Données factices pour les paiements
 const rentPayments = [
@@ -70,7 +75,8 @@ const deposits = [
     property: "Appartement T3 - Paris 9e",
     amount: 2400,
     status: "encaissé",
-    date: "15/03/2023"
+    date: "15/03/2023",
+    shouldReturn: false
   },
   {
     id: 2,
@@ -78,7 +84,8 @@ const deposits = [
     property: "Studio - Lyon 3e",
     amount: 1500,
     status: "encaissé",
-    date: "10/08/2022"
+    date: "10/08/2022",
+    shouldReturn: false
   },
   {
     id: 3,
@@ -86,7 +93,8 @@ const deposits = [
     property: "Maison T4 - Nice",
     amount: 3800,
     status: "encaissé",
-    date: "01/06/2023"
+    date: "01/06/2023",
+    shouldReturn: true
   }
 ];
 
@@ -109,18 +117,111 @@ const ownerPayments = [
   }
 ];
 
+// Liste des biens pour la génération de bordereau
+const ownerProperties = [
+  { id: 1, owner: "Jean Dupont", name: "Appartement T3 - Paris 9e", rent: 1200, fee: 8 },
+  { id: 2, owner: "Jean Dupont", name: "Maison T4 - Nice", rent: 1900, fee: 8 },
+  { id: 3, owner: "Jean Dupont", name: "Studio - Marseille", rent: 550, fee: 8 },
+  { id: 4, owner: "Marie Richard", name: "Loft - Bordeaux", rent: 1500, fee: 7.5 },
+  { id: 5, owner: "Marie Richard", name: "Appartement T2 - Nantes", rent: 850, fee: 7.5 }
+];
+
 const Payments = () => {
   const [activeTab, setActiveTab] = useState("loyers");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("tous");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [selectedProperties, setSelectedProperties] = useState<number[]>([]);
+  const [sortedPayments, setSortedPayments] = useState([...rentPayments]);
+  const [updatedDeposits, setUpdatedDeposits] = useState([...deposits]);
+  const { toast } = useToast();
 
-  // Filtrer les paiements de loyer
-  const filteredRentPayments = rentPayments.filter(payment => {
+  // Sorting logic for payments by date
+  useEffect(() => {
+    const sorted = [...rentPayments].sort((a, b) => {
+      const dateA = a.paymentDate ? new Date(a.paymentDate.split('/').reverse().join('-')) : new Date(0);
+      const dateB = b.paymentDate ? new Date(b.paymentDate.split('/').reverse().join('-')) : new Date(0);
+      
+      return sortDirection === "asc" 
+        ? dateA.getTime() - dateB.getTime() 
+        : dateB.getTime() - dateA.getTime();
+    });
+    
+    setSortedPayments(sorted);
+  }, [sortDirection]);
+
+  // Filtering logic for rent payments
+  const filteredRentPayments = sortedPayments.filter(payment => {
     const matchesSearch = payment.tenant.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           payment.property.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "tous" || payment.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // Toggle sort direction
+  const toggleSortDirection = () => {
+    setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+  };
+
+  // Toggle deposit return status
+  const toggleDepositReturn = (id: number) => {
+    setUpdatedDeposits(prev => 
+      prev.map(deposit => 
+        deposit.id === id ? { ...deposit, shouldReturn: !deposit.shouldReturn } : deposit
+      )
+    );
+  };
+
+  // Handle export with loading animation
+  const handleExport = (format: string) => {
+    setLoading(true);
+    setProgress(0);
+    
+    // Simulate progress
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setLoading(false);
+          toast({
+            title: "Export réussi",
+            description: `Le fichier a été exporté au format ${format}`,
+          });
+          return 0;
+        }
+        return prev + 10;
+      });
+    }, 200);
+  };
+
+  // Calculate total amount for selected properties
+  const calculateTotalAmount = () => {
+    return ownerProperties
+      .filter(prop => selectedProperties.includes(prop.id))
+      .reduce((sum, prop) => {
+        const feeAmount = (prop.rent * prop.fee) / 100;
+        return sum + (prop.rent - feeAmount);
+      }, 0);
+  };
+
+  // Handle property selection for owner payment
+  const togglePropertySelection = (id: number) => {
+    setSelectedProperties(prev => 
+      prev.includes(id) 
+        ? prev.filter(propId => propId !== id) 
+        : [...prev, id]
+    );
+  };
+
+  // Handle payment reminder submission
+  const handleSendReminder = (tenant: string) => {
+    toast({
+      title: "Relance envoyée",
+      description: `La relance a été envoyée à ${tenant}`,
+    });
+  };
 
   // Rendu des badges de statut
   const getStatusBadge = (status: string) => {
@@ -141,6 +242,18 @@ const Payments = () => {
         return <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">En attente</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  // Render status icon
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "payé":
+        return <Check className="h-5 w-5 text-green-600" />;
+      case "retard":
+        return <AlertTriangle className="h-5 w-5 text-red-600" />;
+      default:
+        return null;
     }
   };
 
@@ -242,8 +355,13 @@ const Payments = () => {
                   <option value="à venir">À venir</option>
                 </select>
               </div>
-              <Button variant="outline" size="icon">
-                <Filter className="h-4 w-4" />
+              <Button 
+                variant="outline" 
+                onClick={toggleSortDirection}
+                className="flex items-center gap-2"
+              >
+                <Calendar className="h-4 w-4" />
+                Tri: {sortDirection === "asc" ? "Ancien → Récent" : "Récent → Ancien"}
               </Button>
             </div>
 
@@ -268,7 +386,12 @@ const Payments = () => {
                           <TableCell>{payment.property}</TableCell>
                           <TableCell className="font-medium">{payment.tenant}</TableCell>
                           <TableCell>{payment.amount} €</TableCell>
-                          <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getStatusIcon(payment.status)}
+                              {getStatusBadge(payment.status)}
+                            </div>
+                          </TableCell>
                           <TableCell>{payment.dueDate}</TableCell>
                           <TableCell>{payment.paymentDate || "-"}</TableCell>
                           <TableCell>
@@ -278,9 +401,48 @@ const Payments = () => {
                                 Quittance
                               </Button>
                               {payment.status === "retard" && (
-                                <Button variant="outline" size="sm">
-                                  Relancer
-                                </Button>
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm">
+                                      <Send className="mr-2 h-4 w-4" />
+                                      Relancer
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>Relance de paiement</DialogTitle>
+                                      <DialogDescription>
+                                        Envoyez une relance au locataire pour le paiement en retard.
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                      <div>
+                                        <p className="text-sm font-medium mb-1">Destinataire</p>
+                                        <div className="flex items-center p-2 bg-gray-50 rounded-md">
+                                          <span>{payment.tenant}</span>
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium mb-1">Sujet</p>
+                                        <div className="p-2 bg-gray-50 rounded-md">
+                                          Rappel de paiement de loyer - {payment.dueDate}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium mb-1">Message</p>
+                                        <Textarea
+                                          defaultValue={`Bonjour ${payment.tenant},\n\nNous n'avons pas encore reçu votre paiement de loyer pour le mois de ${payment.dueDate.split("/")[1]}/${payment.dueDate.split("/")[2]} d'un montant de ${payment.amount} €.\n\nNous vous prions de bien vouloir régulariser la situation dans les plus brefs délais.\n\nCordialement,\nVotre agence immobilière`}
+                                          className="min-h-[200px]"
+                                        />
+                                      </div>
+                                    </div>
+                                    <DialogFooter>
+                                      <Button onClick={() => handleSendReminder(payment.tenant)}>
+                                        Envoyer le message
+                                      </Button>
+                                    </DialogFooter>
+                                  </DialogContent>
+                                </Dialog>
                               )}
                             </div>
                           </TableCell>
@@ -311,17 +473,24 @@ const Payments = () => {
                       <TableHead>Montant</TableHead>
                       <TableHead>Statut</TableHead>
                       <TableHead>Date</TableHead>
+                      <TableHead>Restituer ?</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {deposits.map((deposit) => (
+                    {updatedDeposits.map((deposit) => (
                       <TableRow key={deposit.id}>
                         <TableCell className="font-medium">{deposit.tenant}</TableCell>
                         <TableCell>{deposit.property}</TableCell>
                         <TableCell>{deposit.amount} €</TableCell>
                         <TableCell>{getStatusBadge(deposit.status)}</TableCell>
                         <TableCell>{deposit.date}</TableCell>
+                        <TableCell>
+                          <Switch
+                            checked={deposit.shouldReturn}
+                            onCheckedChange={() => toggleDepositReturn(deposit.id)}
+                          />
+                        </TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm">
                             Détails
@@ -338,6 +507,66 @@ const Payments = () => {
           {/* Onglet Versements propriétaires */}
           <TabsContent value="versements" className="space-y-6">
             <Card>
+              <CardHeader>
+                <CardTitle>Générer un bordereau de versement</CardTitle>
+                <CardDescription>Sélectionnez les biens pour calculer automatiquement le montant à verser</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="border rounded-md">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12"></TableHead>
+                          <TableHead>Propriétaire</TableHead>
+                          <TableHead>Bien</TableHead>
+                          <TableHead>Loyer</TableHead>
+                          <TableHead>Honoraires (%)</TableHead>
+                          <TableHead>Montant net</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {ownerProperties.map((property) => {
+                          const netAmount = property.rent - (property.rent * property.fee / 100);
+                          return (
+                            <TableRow key={property.id}>
+                              <TableCell>
+                                <input 
+                                  type="checkbox" 
+                                  checked={selectedProperties.includes(property.id)}
+                                  onChange={() => togglePropertySelection(property.id)}
+                                  className="rounded border-gray-300"
+                                />
+                              </TableCell>
+                              <TableCell>{property.owner}</TableCell>
+                              <TableCell>{property.name}</TableCell>
+                              <TableCell>{property.rent} €</TableCell>
+                              <TableCell>{property.fee}%</TableCell>
+                              <TableCell>{netAmount.toFixed(2)} €</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-md">
+                    <div>
+                      <p className="text-sm font-medium">Total à verser</p>
+                      <p className="text-2xl font-bold">{calculateTotalAmount().toFixed(2)} €</p>
+                    </div>
+                    <Button disabled={selectedProperties.length === 0}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Générer le bordereau
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Historique des versements</CardTitle>
+              </CardHeader>
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
@@ -414,12 +643,32 @@ const Payments = () => {
                       </select>
                     </div>
                   </div>
+                  
+                  {loading && (
+                    <div className="space-y-2">
+                      <Progress value={progress} />
+                      <p className="text-sm text-center text-muted-foreground">
+                        Génération du rapport en cours... {progress}%
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button>
+              <CardFooter className="space-x-2">
+                <Button 
+                  className="hover:bg-gray-200 rounded px-3 py-1"
+                  onClick={() => handleExport("PDF")}
+                >
                   <Download className="mr-2 h-4 w-4" />
-                  Générer le rapport
+                  Exporter en PDF
+                </Button>
+                <Button 
+                  className="hover:bg-gray-200 rounded px-3 py-1" 
+                  variant="outline"
+                  onClick={() => handleExport("CSV")}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Exporter en CSV
                 </Button>
               </CardFooter>
             </Card>
@@ -437,7 +686,11 @@ const Payments = () => {
                           <p className="font-medium">Rapport de loyers - Août 2023</p>
                           <p className="text-sm text-muted-foreground">Généré le 05/09/2023</p>
                         </div>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="hover:bg-gray-200 rounded px-3 py-1"
+                        >
                           <Download className="mr-2 h-4 w-4" />
                           Télécharger
                         </Button>
