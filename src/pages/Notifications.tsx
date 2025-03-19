@@ -1,1016 +1,540 @@
-import { useState } from "react";
-import Layout from "@/components/layout/Layout";
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
+
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Bell, 
-  Building2, 
-  User, 
-  BellRing, 
-  AlertTriangle, 
-  Banknote, 
-  CheckCircle, 
-  Clock, 
-  X, 
-  FileText, 
-  Calendar, 
-  Wrench, 
-  CreditCard, 
-  MessageSquare,
-  ClipboardList,
-  Shield,
-  Eye,
-  Droplet,
-  Thermometer,
-  Lock,
-  Home
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, Bell, Filter, ArrowDown, MoreVertical } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import Layout from '@/components/layout/Layout';
 
 const Notifications = () => {
-  const [activeTab, setActiveTab] = useState("tenant");
-  const [notificationFilters, setNotificationFilters] = useState({
-    tenant: "all",
-    owner: "all",
-    banking: "all",
-    incident: "all"
-  });
+  const [activeTab, setActiveTab] = useState("all");
+  const [tenantFilter, setTenantFilter] = useState("all");
+  const [ownerFilter, setOwnerFilter] = useState("all");
+  const [bankingFilter, setBankingFilter] = useState("all");
+  const [incidentFilter, setIncidentFilter] = useState("all");
 
+  // Tenant notifications
   const tenantNotifications = {
-    "rental-file": [
-      { 
-        id: 1, 
-        title: "Votre dossier a été accepté", 
-        description: "Votre dossier pour l'appartement au 123 Rue de Paris a été accepté.",
+    "dossier-locatif": [
+      {
+        id: 1,
+        title: "Mise à jour du dossier locatif",
+        description: "Votre dossier locatif a été mis à jour avec de nouvelles informations.",
         time: "Il y a 2 heures",
-        type: "success",
+        type: "dossier-locatif",
         read: false
       },
-      { 
-        id: 2, 
-        title: "Complétez votre dossier", 
-        description: "Il manque des documents pour finaliser votre candidature.",
-        time: "Il y a 1 jour",
-        type: "warning",
+      {
+        id: 2,
+        title: "Document manquant",
+        description: "Un document est manquant dans votre dossier locatif. Veuillez le fournir dès que possible.",
+        time: "Hier",
+        type: "dossier-locatif",
         read: true
-      },
+      }
     ],
-    "rental-notification": [
-      { 
-        id: 3, 
-        title: "Nouveau message du propriétaire", 
-        description: "Jean Dupont vous a envoyé un message concernant votre demande de réparation.",
-        time: "Il y a 2 jours",
-        type: "info",
-        read: true
+    "notification-locatif": [
+      {
+        id: 3,
+        title: "Rappel de paiement",
+        description: "Le paiement de votre loyer est prévu pour le 5 du mois prochain.",
+        time: "Il y a 1 jour",
+        type: "notification-locatif",
+        read: false
       },
       {
         id: 4,
-        title: "Rappel de paiement",
-        description: "Le paiement de votre loyer est attendu dans 5 jours.",
-        time: "Il y a 1 jour",
-        type: "warning",
-        read: false
+        title: "Augmentation de loyer",
+        description: "Une augmentation de loyer de 2% sera appliquée à partir du prochain mois.",
+        time: "Il y a 3 jours",
+        type: "notification-locatif",
+        read: true
       }
     ],
-    "visit-request": [
+    "demande-visite": [
       {
         id: 5,
-        title: "Visite programmée",
-        description: "Rappel: Vous avez une visite prévue demain à 14h00 pour le studio rue Saint Louis.",
-        time: "Il y a 1 jour",
-        type: "info",
-        read: true
+        title: "Visite de maintenance programmée",
+        description: "Une visite technique est prévue le 15/06 entre 10h et 12h.",
+        time: "Il y a 5 heures",
+        type: "demande-visite",
+        read: false
       },
       {
         id: 6,
-        title: "Nouvelle disponibilité",
-        description: "De nouvelles plages horaires sont disponibles pour visiter l'appartement.",
-        time: "Il y a 3 heures",
-        type: "info",
-        read: false
+        title: "Visite annuelle",
+        description: "La visite annuelle de contrôle aura lieu le mois prochain.",
+        time: "Il y a 1 semaine",
+        type: "demande-visite",
+        read: true
       }
     ],
-    "equipment-revision": [
+    "revision-equipement": [
       {
         id: 7,
-        title: "Maintenance annuelle",
-        description: "La révision annuelle de la chaudière est prévue le 15 mars.",
-        time: "Il y a 4 jours",
-        type: "info",
-        read: true
+        title: "Révision de la chaudière",
+        description: "La révision annuelle de votre chaudière est programmée pour la semaine prochaine.",
+        time: "Il y a 2 jours",
+        type: "revision-equipement",
+        read: false
       },
       {
         id: 8,
-        title: "Rappel d'entretien",
-        description: "L'entretien des filtres de la climatisation est à prévoir ce mois-ci.",
-        time: "Il y a 2 jours",
-        type: "warning",
-        read: false
+        title: "Maintenance des détecteurs de fumée",
+        description: "Une vérification des détecteurs de fumée est nécessaire.",
+        time: "Il y a 2 semaines",
+        type: "revision-equipement",
+        read: true
       }
     ]
   };
 
+  // Owner notifications
   const ownerNotifications = {
-    "owner-file": [
-      { 
-        id: 1, 
-        title: "Nouvelle candidature", 
-        description: "Sophie Martin a déposé une candidature pour votre appartement du 45 Avenue Victor Hugo.",
-        time: "Il y a 1 heure",
-        type: "info",
+    "dossier-proprietaire": [
+      {
+        id: 9,
+        title: "Nouveau document ajouté",
+        description: "Un nouveau document a été ajouté à votre dossier propriétaire.",
+        time: "Il y a 3 heures",
+        type: "dossier-proprietaire",
         read: false
       },
       {
-        id: 2,
-        title: "Dossier incomplet",
-        description: "Le dossier de candidature de Marc Lefebvre nécessite des informations supplémentaires.",
-        time: "Il y a 5 heures",
-        type: "warning",
-        read: true
-      }
-    ],
-    "bank": [
-      { 
-        id: 3, 
-        title: "Loyer reçu", 
-        description: "Le loyer de mars 2023 a été reçu pour le bien 123 Rue de Paris.",
-        time: "Il y a 3 jours",
-        type: "success",
-        read: true
-      },
-      {
-        id: 4,
-        title: "Versement effectué",
-        description: "Le versement mensuel de 950€ a été effectué sur votre compte bancaire.",
-        time: "Il y a 1 semaine",
-        type: "success",
-        read: true
-      }
-    ],
-    "owner-request": [
-      { 
-        id: 5, 
-        title: "Demande de travaux", 
-        description: "Votre locataire a signalé un problème de plomberie dans la salle de bain.",
-        time: "Il y a 5 jours",
-        type: "warning",
-        read: false
-      },
-      {
-        id: 6,
-        title: "Question du locataire",
-        description: "Le locataire demande s'il peut installer une antenne parabolique.",
+        id: 10,
+        title: "Mise à jour fiscale",
+        description: "Des informations fiscales importantes ont été mises à jour dans votre dossier.",
         time: "Il y a 2 jours",
-        type: "info",
+        type: "dossier-proprietaire",
+        read: true
+      }
+    ],
+    "banque": [
+      {
+        id: 11,
+        title: "Virement effectué",
+        description: "Le virement des loyers du mois a été effectué sur votre compte.",
+        time: "Aujourd'hui",
+        type: "banque",
         read: false
+      },
+      {
+        id: 12,
+        title: "Relevé de gestion disponible",
+        description: "Votre relevé de gestion du trimestre est disponible.",
+        time: "Il y a 5 jours",
+        type: "banque",
+        read: true
+      }
+    ],
+    "solicitation-proprietaire": [
+      {
+        id: 13,
+        title: "Demande de travaux",
+        description: "Le locataire a fait une demande de travaux pour la salle de bain.",
+        time: "Il y a 1 jour",
+        type: "solicitation-proprietaire",
+        read: false
+      },
+      {
+        id: 14,
+        title: "Renouvellement de bail",
+        description: "Le bail de votre locataire arrive à échéance dans 3 mois.",
+        time: "Il y a 1 semaine",
+        type: "solicitation-proprietaire",
+        read: true
       }
     ]
   };
 
+  // Banking notifications
   const bankingNotifications = {
-    "administrative-request": [
-      { 
-        id: 1, 
-        title: "Attestation d'assurance disponible", 
-        description: "Votre nouvelle attestation d'assurance habitation est disponible.",
-        time: "Il y a 5 heures",
-        type: "info",
+    "demande-administratif": [
+      {
+        id: 15,
+        title: "Document requis",
+        description: "Veuillez fournir une attestation d'assurance mise à jour.",
+        time: "Il y a 6 heures",
+        type: "demande-administratif",
         read: false
       },
       {
-        id: 2,
-        title: "Document requis",
-        description: "Veuillez fournir votre dernier avis d'imposition pour mettre à jour votre dossier.",
-        time: "Il y a 2 jours",
-        type: "warning",
+        id: 16,
+        title: "Validation de compte",
+        description: "Votre RIB a été validé avec succès.",
+        time: "Il y a 4 jours",
+        type: "demande-administratif",
         read: true
       }
     ],
     "payment": [
-      { 
-        id: 3, 
-        title: "Virement reçu", 
-        description: "Un virement de 1200€ a été reçu de la part de Marie Laurent pour le loyer.",
-        time: "Il y a 7 jours",
-        type: "success",
-        read: true
+      {
+        id: 17,
+        title: "Paiement reçu",
+        description: "Le paiement du mois de juin a été reçu et traité.",
+        time: "Hier",
+        type: "payment",
+        read: false
       },
       {
-        id: 4,
-        title: "Paiement en attente",
-        description: "Le paiement du loyer pour l'appartement rue Victor Hugo est en attente de validation.",
-        time: "Il y a 1 jour",
-        type: "warning",
-        read: false
+        id: 18,
+        title: "Échéance à venir",
+        description: "Une échéance de paiement est prévue pour le 1er du mois prochain.",
+        time: "Il y a 3 jours",
+        type: "payment",
+        read: true
       }
     ],
-    "insurance": [
-      { 
-        id: 5, 
-        title: "Renouvellement de garantie", 
-        description: "Votre garantie loyers impayés arrive à échéance dans 15 jours.",
+    "assurance": [
+      {
+        id: 19,
+        title: "Renouvellement d'assurance",
+        description: "Votre assurance habitation doit être renouvelée avant la fin du mois.",
         time: "Il y a 2 jours",
-        type: "warning",
-        read: true
+        type: "assurance",
+        read: false
       },
       {
-        id: 6,
-        title: "Nouvelle offre d'assurance",
-        description: "Découvrez notre nouvelle offre d'assurance habitation à tarif préférentiel.",
-        time: "Il y a 3 jours",
-        type: "info",
-        read: false
+        id: 20,
+        title: "Contrat mis à jour",
+        description: "Les termes de votre contrat d'assurance ont été mis à jour.",
+        time: "Il y a 2 semaines",
+        type: "assurance",
+        read: true
       }
     ]
   };
 
+  // Incident notifications
   const incidentNotifications = {
     "water-damage": [
-      { 
-        id: 1, 
-        title: "Dégât des eaux signalé", 
-        description: "Un dégât des eaux a été signalé au 123 Rue de Paris, 2ème étage.",
-        time: "Il y a 30 minutes",
-        type: "error",
-        read: false
-      },
-      { 
-        id: 2, 
-        title: "Fuite de canalisation", 
-        description: "Fuite détectée dans la salle de bain de l'appartement 3B.",
-        time: "Il y a 2 heures",
-        type: "error",
-        read: false
-      },
-    ],
-    "heating-electricity": [
-      { 
-        id: 3, 
-        title: "Panne de chauffage", 
-        description: "Le chauffage ne fonctionne plus dans l'immeuble du 45 Avenue Victor Hugo.",
-        time: "Il y a 4 heures",
-        type: "error",
+      {
+        id: 21,
+        title: "Dégât des eaux signalé",
+        description: "Un dégât des eaux a été signalé dans la salle de bain de l'appartement 103.",
+        time: "Il y a 3 heures",
+        type: "water-damage",
         read: false
       },
       {
-        id: 4,
-        title: "Coupure électrique",
-        description: "Coupure électrique signalée au 2ème étage, un technicien a été contacté.",
-        time: "Il y a 1 jour",
-        type: "warning",
+        id: 22,
+        title: "Intervention plombier",
+        description: "Le plombier est intervenu suite au dégât des eaux. Rapport disponible.",
+        time: "Il y a 2 jours",
+        type: "water-damage",
+        read: true
+      }
+    ],
+    "heating-electricity": [
+      {
+        id: 23,
+        title: "Panne de chauffage",
+        description: "Une panne de chauffage a été signalée dans l'immeuble B.",
+        time: "Aujourd'hui",
+        type: "heating-electricity",
+        read: false
+      },
+      {
+        id: 24,
+        title: "Coupure électrique prévue",
+        description: "Une coupure électrique est prévue le 20/06 pour travaux de maintenance.",
+        time: "Il y a 4 jours",
+        type: "heating-electricity",
         read: true
       }
     ],
     "security-access": [
       {
-        id: 5,
-        title: "Porte d'entrée endommagée",
-        description: "La porte d'entrée de l'immeuble ne ferme plus correctement.",
+        id: 25,
+        title: "Problème de serrure",
+        description: "Un locataire signale un problème avec la serrure de la porte d'entrée.",
         time: "Il y a 1 jour",
-        type: "warning",
+        type: "security-access",
         read: false
       },
       {
-        id: 6,
-        title: "Problème d'interphone",
-        description: "L'interphone ne fonctionne plus pour les appartements 5 à 8.",
-        time: "Il y a 3 jours",
-        type: "warning",
+        id: 26,
+        title: "Mise à jour du système d'accès",
+        description: "Le système de badges d'accès sera mis à jour la semaine prochaine.",
+        time: "Il y a 1 semaine",
+        type: "security-access",
         read: true
       }
     ],
     "maintenance-repairs": [
       {
-        id: 7,
-        title: "Intervention plombier planifiée",
-        description: "Un plombier interviendra demain entre 9h et 11h pour réparer la fuite.",
-        time: "Il y a 2 heures",
-        type: "info",
+        id: 27,
+        title: "Intervention de maintenance",
+        description: "Une intervention de maintenance est programmée pour la toiture de l'immeuble.",
+        time: "Il y a 5 heures",
+        type: "maintenance-repairs",
         read: false
       },
       {
-        id: 8,
-        title: "Réparation terminée",
-        description: "Le problème électrique au 45 Avenue Victor Hugo a été résolu.",
-        time: "Il y a 5 jours",
-        type: "success",
+        id: 28,
+        title: "Réparation effectuée",
+        description: "La réparation du volet roulant de l'appartement 205 a été effectuée.",
+        time: "Il y a 3 jours",
+        type: "maintenance-repairs",
         read: true
       }
     ]
   };
 
-  const renderIcon = (type) => {
-    switch (type) {
-      case "success":
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "warning":
-        return <Clock className="h-5 w-5 text-amber-500" />;
-      case "error":
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
-      case "info":
-      default:
-        return <Bell className="h-5 w-5 text-blue-500" />;
+  // Generic function to get filtered notifications based on type and filter
+  const getFilteredNotifications = (notificationsObj, filter) => {
+    if (filter === "all") {
+      // Flatten the object of arrays into a single array
+      return Object.values(notificationsObj).flat();
+    } else {
+      // Return just the array for the selected filter
+      return notificationsObj[filter] || [];
     }
   };
 
-  const getNotificationTypeIcon = (category, type) => {
-    if (category === "tenant") {
-      switch (type) {
-        case "rental-file":
-          return <FileText className="h-5 w-5 text-blue-500" />;
-        case "rental-notification":
-          return <BellRing className="h-5 w-5 text-purple-500" />;
-        case "visit-request":
-          return <Calendar className="h-5 w-5 text-green-500" />;
-        case "equipment-revision":
-          return <Wrench className="h-5 w-5 text-orange-500" />;
-        default:
-          return <Bell className="h-5 w-5 text-blue-500" />;
-      }
-    } else if (category === "owner") {
-      switch (type) {
-        case "owner-file":
-          return <FileText className="h-5 w-5 text-blue-500" />;
-        case "bank":
-          return <CreditCard className="h-5 w-5 text-green-500" />;
-        case "owner-request":
-          return <MessageSquare className="h-5 w-5 text-purple-500" />;
-        default:
-          return <Bell className="h-5 w-5 text-blue-500" />;
-      }
-    } else if (category === "banking") {
-      switch (type) {
-        case "administrative-request":
-          return <ClipboardList className="h-5 w-5 text-blue-500" />;
-        case "payment":
-          return <Banknote className="h-5 w-5 text-green-500" />;
-        case "insurance":
-          return <Shield className="h-5 w-5 text-purple-500" />;
-        default:
-          return <Bell className="h-5 w-5 text-blue-500" />;
-      }
-    }
-    return <Bell className="h-5 w-5 text-blue-500" />;
-  };
-
-  const getTabIcon = (tabKey) => {
-    switch (tabKey) {
+  // Get filtered notifications based on active tab and respective filter
+  const getTabNotifications = () => {
+    switch (activeTab) {
       case "tenant":
-        return <User className="h-4 w-4 mr-2" />;
+        return getFilteredNotifications(tenantNotifications, tenantFilter);
       case "owner":
-        return <Building2 className="h-4 w-4 mr-2" />;
+        return getFilteredNotifications(ownerNotifications, ownerFilter);
       case "banking":
-        return <Banknote className="h-4 w-4 mr-2" />;
+        return getFilteredNotifications(bankingNotifications, bankingFilter);
       case "incident":
-        return <AlertTriangle className="h-4 w-4 mr-2" />;
+        return getFilteredNotifications(incidentNotifications, incidentFilter);
+      case "all":
+        return [
+          ...getFilteredNotifications(tenantNotifications, tenantFilter),
+          ...getFilteredNotifications(ownerNotifications, ownerFilter),
+          ...getFilteredNotifications(bankingNotifications, bankingFilter),
+          ...getFilteredNotifications(incidentNotifications, incidentFilter)
+        ];
       default:
-        return null;
+        return [];
     }
   };
 
-  const getTabTitle = (tabKey) => {
-    switch (tabKey) {
-      case "tenant":
-        return "Locataire";
-      case "owner":
-        return "Propriétaire";
-      case "banking":
-        return "Banque/Assurance";
-      case "incident":
-        return "Incident";
-      default:
-        return "";
-    }
-  };
-
-  const getTenantFilters = () => (
-    <div className="flex flex-wrap gap-2 mb-4">
-      <Button 
-        variant={notificationFilters.tenant === "all" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, tenant: "all"})}
-      >
-        Tous
-      </Button>
-      <Button 
-        variant={notificationFilters.tenant === "rental-file" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, tenant: "rental-file"})}
-        className="flex items-center gap-1"
-      >
-        <FileText className="h-4 w-4" /> Dossier locatif
-      </Button>
-      <Button 
-        variant={notificationFilters.tenant === "rental-notification" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, tenant: "rental-notification"})}
-        className="flex items-center gap-1"
-      >
-        <BellRing className="h-4 w-4" /> Notification locatif
-      </Button>
-      <Button 
-        variant={notificationFilters.tenant === "visit-request" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, tenant: "visit-request"})}
-        className="flex items-center gap-1"
-      >
-        <Eye className="h-4 w-4" /> Demande de visite
-      </Button>
-      <Button 
-        variant={notificationFilters.tenant === "equipment-revision" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, tenant: "equipment-revision"})}
-        className="flex items-center gap-1"
-      >
-        <Wrench className="h-4 w-4" /> Révision équipement
-      </Button>
-    </div>
-  );
-
-  const getOwnerFilters = () => (
-    <div className="flex flex-wrap gap-2 mb-4">
-      <Button 
-        variant={notificationFilters.owner === "all" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, owner: "all"})}
-      >
-        Tous
-      </Button>
-      <Button 
-        variant={notificationFilters.owner === "owner-file" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, owner: "owner-file"})}
-        className="flex items-center gap-1"
-      >
-        <FileText className="h-4 w-4" /> Dossier propriétaire
-      </Button>
-      <Button 
-        variant={notificationFilters.owner === "bank" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, owner: "bank"})}
-        className="flex items-center gap-1"
-      >
-        <Banknote className="h-4 w-4" /> Banque
-      </Button>
-      <Button 
-        variant={notificationFilters.owner === "owner-request" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, owner: "owner-request"})}
-        className="flex items-center gap-1"
-      >
-        <MessageSquare className="h-4 w-4" /> Sollicitation propriétaire
-      </Button>
-    </div>
-  );
-
-  const getBankingFilters = () => (
-    <div className="flex flex-wrap gap-2 mb-4">
-      <Button 
-        variant={notificationFilters.banking === "all" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, banking: "all"})}
-      >
-        Tous
-      </Button>
-      <Button 
-        variant={notificationFilters.banking === "administrative-request" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, banking: "administrative-request"})}
-        className="flex items-center gap-1"
-      >
-        <ClipboardList className="h-4 w-4" /> Demande administrative
-      </Button>
-      <Button 
-        variant={notificationFilters.banking === "payment" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, banking: "payment"})}
-        className="flex items-center gap-1"
-      >
-        <CreditCard className="h-4 w-4" /> Paiement
-      </Button>
-      <Button 
-        variant={notificationFilters.banking === "insurance" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, banking: "insurance"})}
-        className="flex items-center gap-1"
-      >
-        <Shield className="h-4 w-4" /> Assurance
-      </Button>
-    </div>
-  );
-
-  const getIncidentTypeIcon = (type) => {
-    switch (type) {
-      case "water-damage":
-        return <Droplet className="h-5 w-5 text-blue-500" />;
-      case "heating-electricity":
-        return <Thermometer className="h-5 w-5 text-red-500" />;
-      case "security-access":
-        return <Lock className="h-5 w-5 text-amber-500" />;
-      case "maintenance-repairs":
-        return <Wrench className="h-5 w-5 text-green-500" />;
-      default:
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
-    }
-  };
-
-  const getIncidentFilters = () => (
-    <div className="flex flex-wrap gap-2 mb-4">
-      <Button 
-        variant={notificationFilters.incident === "all" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, incident: "all"})}
-      >
-        Tous
-      </Button>
-      <Button 
-        variant={notificationFilters.incident === "water-damage" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, incident: "water-damage"})}
-        className="flex items-center gap-1"
-      >
-        <Droplet className="h-4 w-4" /> Dégât des eaux
-      </Button>
-      <Button 
-        variant={notificationFilters.incident === "heating-electricity" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, incident: "heating-electricity"})}
-        className="flex items-center gap-1"
-      >
-        <Thermometer className="h-4 w-4" /> Chauffage/Électricité
-      </Button>
-      <Button 
-        variant={notificationFilters.incident === "security-access" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, incident: "security-access"})}
-        className="flex items-center gap-1"
-      >
-        <Lock className="h-4 w-4" /> Sécurité/Accès
-      </Button>
-      <Button 
-        variant={notificationFilters.incident === "maintenance-repairs" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setNotificationFilters({...notificationFilters, incident: "maintenance-repairs"})}
-        className="flex items-center gap-1"
-      >
-        <Wrench className="h-4 w-4" /> Maintenance/Réparations
-      </Button>
-    </div>
-  );
-
-  const getFilteredTenantNotifications = () => {
-    if (notificationFilters.tenant === "all") {
-      return [
-        ...tenantNotifications["rental-file"],
-        ...tenantNotifications["rental-notification"],
-        ...tenantNotifications["visit-request"],
-        ...tenantNotifications["equipment-revision"]
-      ];
-    } else {
-      return tenantNotifications[notificationFilters.tenant] || [];
-    }
-  };
-
-  const getFilteredOwnerNotifications = () => {
-    if (notificationFilters.owner === "all") {
-      return [
-        ...ownerNotifications["owner-file"],
-        ...ownerNotifications["bank"],
-        ...ownerNotifications["owner-request"]
-      ];
-    } else {
-      return ownerNotifications[notificationFilters.owner] || [];
-    }
-  };
-
-  const getFilteredBankingNotifications = () => {
-    if (notificationFilters.banking === "all") {
-      return [
-        ...bankingNotifications["administrative-request"],
-        ...bankingNotifications["payment"],
-        ...bankingNotifications["insurance"]
-      ];
-    } else {
-      return bankingNotifications[notificationFilters.banking] || [];
-    }
-  };
-
-  const getFilteredIncidentNotifications = () => {
-    if (notificationFilters.incident === "all") {
-      return [
-        ...incidentNotifications["water-damage"],
-        ...incidentNotifications["heating-electricity"],
-        ...incidentNotifications["security-access"],
-        ...incidentNotifications["maintenance-repairs"]
-      ];
-    } else {
-      return incidentNotifications[notificationFilters.incident] || [];
-    }
-  };
-
-  const getNotificationTypeLabel = (category, item) => {
-    if (category === "tenant") {
-      if (tenantNotifications["rental-file"].find(n => n.id === item.id)) return "Dossier locatif";
-      if (tenantNotifications["rental-notification"].find(n => n.id === item.id)) return "Notification locatif";
-      if (tenantNotifications["visit-request"].find(n => n.id === item.id)) return "Demande de visite";
-      if (tenantNotifications["equipment-revision"].find(n => n.id === item.id)) return "Révision équipement";
-    } else if (category === "owner") {
-      if (ownerNotifications["owner-file"].find(n => n.id === item.id)) return "Dossier propriétaire";
-      if (ownerNotifications["bank"].find(n => n.id === item.id)) return "Banque";
-      if (ownerNotifications["owner-request"].find(n => n.id === item.id)) return "Sollicitation propriétaire";
-    } else if (category === "banking") {
-      if (bankingNotifications["administrative-request"].find(n => n.id === item.id)) return "Demande administrative";
-      if (bankingNotifications["payment"].find(n => n.id === item.id)) return "Paiement";
-      if (bankingNotifications["insurance"].find(n => n.id === item.id)) return "Assurance";
-    }
-    return "";
-  };
-
-  const getNotificationIcon = (category, item) => {
-    if (category === "tenant") {
-      if (tenantNotifications["rental-file"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("tenant", "rental-file");
-      if (tenantNotifications["rental-notification"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("tenant", "rental-notification");
-      if (tenantNotifications["visit-request"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("tenant", "visit-request");
-      if (tenantNotifications["equipment-revision"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("tenant", "equipment-revision");
-    } else if (category === "owner") {
-      if (ownerNotifications["owner-file"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("owner", "owner-file");
-      if (ownerNotifications["bank"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("owner", "bank");
-      if (ownerNotifications["owner-request"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("owner", "owner-request");
-    } else if (category === "banking") {
-      if (bankingNotifications["administrative-request"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("banking", "administrative-request");
-      if (bankingNotifications["payment"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("banking", "payment");
-      if (bankingNotifications["insurance"].find(n => n.id === item.id)) 
-        return getNotificationTypeIcon("banking", "insurance");
-    }
-    return renderIcon(item.type);
-  };
-
-  const getIncidentTypeLabel = (item) => {
-    if (incidentNotifications["water-damage"].find(n => n.id === item.id)) return "Dégât des eaux";
-    if (incidentNotifications["heating-electricity"].find(n => n.id === item.id)) return "Chauffage/Électricité";
-    if (incidentNotifications["security-access"].find(n => n.id === item.id)) return "Sécurité/Accès";
-    if (incidentNotifications["maintenance-repairs"].find(n => n.id === item.id)) return "Maintenance/Réparations";
-    return "";
-  };
-
-  const getIncidentNotificationIcon = (item) => {
-    if (incidentNotifications["water-damage"].find(n => n.id === item.id)) 
-      return getIncidentTypeIcon("water-damage");
-    if (incidentNotifications["heating-electricity"].find(n => n.id === item.id)) 
-      return getIncidentTypeIcon("heating-electricity");
-    if (incidentNotifications["security-access"].find(n => n.id === item.id)) 
-      return getIncidentTypeIcon("security-access");
-    if (incidentNotifications["maintenance-repairs"].find(n => n.id === item.id)) 
-      return getIncidentTypeIcon("maintenance-repairs");
-    return renderIcon(item.type);
-  };
-
-  const countUnreadNotifications = (category) => {
-    if (category === "tenant") {
-      return getFilteredTenantNotifications().filter(n => !n.read).length;
-    } else if (category === "owner") {
-      return getFilteredOwnerNotifications().filter(n => !n.read).length;
-    } else if (category === "banking") {
-      return getFilteredBankingNotifications().filter(n => !n.read).length;
-    } else if (category === "incident") {
-      return incidentNotifications.filter(n => !n.read).length;
-    }
-    return 0;
-  };
-
-  const countIncidentsByType = (type) => {
-    return incidentNotifications[type] ? incidentNotifications[type].length : 0;
-  };
+  const notifications = getTabNotifications();
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Notifications</h1>
-            <p className="text-muted-foreground">Gérez toutes vos notifications et alertes</p>
+            <h1 className="text-2xl font-bold">Notifications</h1>
+            <p className="text-gray-500">Gérez vos notifications et restez informé</p>
           </div>
-          <Button variant="outline" className="flex items-center gap-2">
-            <BellRing className="h-4 w-4" />
-            Marquer tout comme lu
-          </Button>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Bell size={14} /> {unreadCount} non lues
+            </Badge>
+            <Button variant="outline" size="sm">
+              <CheckCircle size={14} className="mr-1" /> Tout marquer comme lu
+            </Button>
+          </div>
         </div>
 
-        <Tabs defaultValue="tenant" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-4 gap-4 w-full">
-            <TabsTrigger value="tenant" className="flex items-center">
-              <User className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Locataire</span>
-              <Badge className="ml-2 bg-blue-500" variant="default">
-                {getFilteredTenantNotifications().filter(n => !n.read).length}
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="owner" className="flex items-center">
-              <Building2 className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Propriétaire</span>
-              <Badge className="ml-2 bg-blue-500" variant="default">
-                {getFilteredOwnerNotifications().filter(n => !n.read).length}
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="banking" className="flex items-center">
-              <Banknote className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Banque/Assurance</span>
-              <Badge className="ml-2 bg-blue-500" variant="default">
-                {getFilteredBankingNotifications().filter(n => !n.read).length}
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="incident" className="flex items-center">
-              <AlertTriangle className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Incident</span>
-              <Badge className="ml-2 bg-blue-500" variant="default">
-                {getFilteredIncidentNotifications().filter(n => !n.read).length}
-              </Badge>
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+          <div className="flex justify-between items-center mb-4">
+            <TabsList>
+              <TabsTrigger value="all">Toutes</TabsTrigger>
+              <TabsTrigger value="tenant">Locataire</TabsTrigger>
+              <TabsTrigger value="owner">Propriétaire</TabsTrigger>
+              <TabsTrigger value="banking">Banque/Assurance</TabsTrigger>
+              <TabsTrigger value="incident">Incidents</TabsTrigger>
+            </TabsList>
+            
+            {activeTab === "tenant" && (
+              <Select value={tenantFilter} onValueChange={setTenantFilter}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Filtrer par type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les types</SelectItem>
+                  <SelectItem value="dossier-locatif">Dossier locatif</SelectItem>
+                  <SelectItem value="notification-locatif">Notification locatif</SelectItem>
+                  <SelectItem value="demande-visite">Demande de visite</SelectItem>
+                  <SelectItem value="revision-equipement">Révision équipement</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
 
+            {activeTab === "owner" && (
+              <Select value={ownerFilter} onValueChange={setOwnerFilter}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Filtrer par type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les types</SelectItem>
+                  <SelectItem value="dossier-proprietaire">Dossier propriétaire</SelectItem>
+                  <SelectItem value="banque">Banque</SelectItem>
+                  <SelectItem value="solicitation-proprietaire">Solicitation propriétaire</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+
+            {activeTab === "banking" && (
+              <Select value={bankingFilter} onValueChange={setBankingFilter}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Filtrer par type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les types</SelectItem>
+                  <SelectItem value="demande-administratif">Demande administratif</SelectItem>
+                  <SelectItem value="payment">Paiement</SelectItem>
+                  <SelectItem value="assurance">Assurance</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+
+            {activeTab === "incident" && (
+              <Select value={incidentFilter} onValueChange={setIncidentFilter}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Filtrer par type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les types</SelectItem>
+                  <SelectItem value="water-damage">Dégât des eaux</SelectItem>
+                  <SelectItem value="heating-electricity">Chauffage/Électricité</SelectItem>
+                  <SelectItem value="security-access">Sécurité/Accès</SelectItem>
+                  <SelectItem value="maintenance-repairs">Maintenance/Réparations</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          <TabsContent value="all" className="space-y-4">
+            {notifications.length > 0 ? (
+              notifications.map(notification => (
+                <NotificationCard key={notification.id} notification={notification} />
+              ))
+            ) : (
+              <EmptyState />
+            )}
+          </TabsContent>
+          
           <TabsContent value="tenant" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center">
-                  {getTabIcon("tenant")}
-                  <CardTitle>Notifications {getTabTitle("tenant")}</CardTitle>
-                </div>
-                <CardDescription>
-                  {getFilteredTenantNotifications().length} notifications, dont {countUnreadNotifications("tenant")} non lues
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {getTenantFilters()}
-                
-                {getFilteredTenantNotifications().map((notification) => (
-                  <div 
-                    key={notification.id} 
-                    className={`flex items-start justify-between p-4 border rounded-lg ${notification.read ? 'bg-white' : 'bg-blue-50'}`}
-                  >
-                    <div className="flex gap-4">
-                      <div className="mt-1">
-                        {getNotificationIcon("tenant", notification)}
-                      </div>
-                      <div>
-                        <div className="flex items-center flex-wrap">
-                          <p className="font-medium">{notification.title}</p>
-                          {!notification.read && (
-                            <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800">
-                              Nouveau
-                            </Badge>
-                          )}
-                          <Badge variant="outline" className="ml-2 text-xs">
-                            {getNotificationTypeLabel("tenant", notification)}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{notification.description}</p>
-                        <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+            {getFilteredNotifications(tenantNotifications, tenantFilter).length > 0 ? (
+              getFilteredNotifications(tenantNotifications, tenantFilter).map(notification => (
+                <NotificationCard key={notification.id} notification={notification} />
+              ))
+            ) : (
+              <EmptyState />
+            )}
           </TabsContent>
-
+          
           <TabsContent value="owner" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center">
-                  {getTabIcon("owner")}
-                  <CardTitle>Notifications {getTabTitle("owner")}</CardTitle>
-                </div>
-                <CardDescription>
-                  {getFilteredOwnerNotifications().length} notifications, dont {countUnreadNotifications("owner")} non lues
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {getOwnerFilters()}
-                
-                {getFilteredOwnerNotifications().map((notification) => (
-                  <div 
-                    key={notification.id} 
-                    className={`flex items-start justify-between p-4 border rounded-lg ${notification.read ? 'bg-white' : 'bg-blue-50'}`}
-                  >
-                    <div className="flex gap-4">
-                      <div className="mt-1">
-                        {getNotificationIcon("owner", notification)}
-                      </div>
-                      <div>
-                        <div className="flex items-center flex-wrap">
-                          <p className="font-medium">{notification.title}</p>
-                          {!notification.read && (
-                            <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800">
-                              Nouveau
-                            </Badge>
-                          )}
-                          <Badge variant="outline" className="ml-2 text-xs">
-                            {getNotificationTypeLabel("owner", notification)}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{notification.description}</p>
-                        <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+            {getFilteredNotifications(ownerNotifications, ownerFilter).length > 0 ? (
+              getFilteredNotifications(ownerNotifications, ownerFilter).map(notification => (
+                <NotificationCard key={notification.id} notification={notification} />
+              ))
+            ) : (
+              <EmptyState />
+            )}
           </TabsContent>
-
+          
           <TabsContent value="banking" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center">
-                  {getTabIcon("banking")}
-                  <CardTitle>Notifications {getTabTitle("banking")}</CardTitle>
-                </div>
-                <CardDescription>
-                  {getFilteredBankingNotifications().length} notifications, dont {countUnreadNotifications("banking")} non lues
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {getBankingFilters()}
-                
-                {getFilteredBankingNotifications().map((notification) => (
-                  <div 
-                    key={notification.id} 
-                    className={`flex items-start justify-between p-4 border rounded-lg ${notification.read ? 'bg-white' : 'bg-blue-50'}`}
-                  >
-                    <div className="flex gap-4">
-                      <div className="mt-1">
-                        {getNotificationIcon("banking", notification)}
-                      </div>
-                      <div>
-                        <div className="flex items-center flex-wrap">
-                          <p className="font-medium">{notification.title}</p>
-                          {!notification.read && (
-                            <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800">
-                              Nouveau
-                            </Badge>
-                          )}
-                          <Badge variant="outline" className="ml-2 text-xs">
-                            {getNotificationTypeLabel("banking", notification)}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{notification.description}</p>
-                        <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+            {getFilteredNotifications(bankingNotifications, bankingFilter).length > 0 ? (
+              getFilteredNotifications(bankingNotifications, bankingFilter).map(notification => (
+                <NotificationCard key={notification.id} notification={notification} />
+              ))
+            ) : (
+              <EmptyState />
+            )}
           </TabsContent>
-
+          
           <TabsContent value="incident" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center">
-                  {getTabIcon("incident")}
-                  <CardTitle>Notifications {getTabTitle("incident")}</CardTitle>
-                </div>
-                <CardDescription>
-                  {getFilteredIncidentNotifications().length} notifications, dont {countUnreadNotifications("incident")} non lues
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {getIncidentFilters()}
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2">
-                        <Droplet className="h-4 w-4 text-blue-500" />
-                        <CardTitle className="text-sm font-medium">Dégâts des eaux</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">{countIncidentsByType("water-damage")}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {incidentNotifications["water-damage"].filter(n => !n.read).length} non traités
-                      </p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2">
-                        <Thermometer className="h-4 w-4 text-red-500" />
-                        <CardTitle className="text-sm font-medium">Chauffage/Électricité</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">{countIncidentsByType("heating-electricity")}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {incidentNotifications["heating-electricity"].filter(n => !n.read).length} non traités
-                      </p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-amber-500" />
-                        <CardTitle className="text-sm font-medium">Sécurité/Accès</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">{countIncidentsByType("security-access")}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {incidentNotifications["security-access"].filter(n => !n.read).length} non traités
-                      </p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2">
-                        <Wrench className="h-4 w-4 text-green-500" />
-                        <CardTitle className="text-sm font-medium">Maintenance/Réparations</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">{countIncidentsByType("maintenance-repairs")}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {incidentNotifications["maintenance-repairs"].filter(n => !n.read).length} non traités
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-                
-                <div className="space-y-4">
-                  {getFilteredIncidentNotifications().map((notification) => (
-                    <div 
-                      key={notification.id} 
-                      className={`flex items-start justify-between p-4 border rounded-lg ${notification.read ? 'bg-white' : 'bg-blue-50'}`}
-                    >
-                      <div className="flex gap-4">
-                        <div className="mt-1">
-                          {getIncidentNotificationIcon(notification)}
-                        </div>
-                        <div>
-                          <div className="flex items-center flex-wrap">
-                            <p className="font-medium">{notification.title}</p>
-                            {!notification.read && (
-                              <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800">
-                                Nouveau
-                              </Badge>
-                            )}
-                            <Badge variant="outline" className="ml-2 text-xs">
-                              {getIncidentTypeLabel(notification)}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">{notification.description}</p>
-                          <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {getFilteredNotifications(incidentNotifications, incidentFilter).length > 0 ? (
+              getFilteredNotifications(incidentNotifications, incidentFilter).map(notification => (
+                <NotificationCard key={notification.id} notification={notification} />
+              ))
+            ) : (
+              <EmptyState />
+            )}
           </TabsContent>
         </Tabs>
       </div>
     </Layout>
   );
+};
+
+const NotificationCard = ({ notification }) => {
+  return (
+    <Card className={`transition hover:bg-muted/50 ${!notification.read ? 'border-l-4 border-l-primary' : ''}`}>
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <Badge variant={notification.read ? "outline" : "default"} className="text-xs">
+                {getNotificationTypeLabel(notification.type)}
+              </Badge>
+              {!notification.read && (
+                <div className="w-2 h-2 rounded-full bg-primary" />
+              )}
+            </div>
+            <h3 className="font-medium">{notification.title}</h3>
+            <p className="text-sm text-gray-500 mt-1">{notification.description}</p>
+            <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreVertical size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>Marquer comme lu</DropdownMenuItem>
+              <DropdownMenuItem>Archiver</DropdownMenuItem>
+              <DropdownMenuItem>Supprimer</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const EmptyState = () => {
+  return (
+    <div className="text-center py-10">
+      <Bell size={40} className="mx-auto text-gray-300 mb-4" />
+      <h3 className="text-lg font-medium text-gray-500">Aucune notification</h3>
+      <p className="text-gray-400 mt-1">Vous n'avez aucune notification dans cette catégorie</p>
+    </div>
+  );
+};
+
+const getNotificationTypeLabel = (type) => {
+  const labels = {
+    // Tenant
+    "dossier-locatif": "Dossier locatif",
+    "notification-locatif": "Notification locatif",
+    "demande-visite": "Demande de visite",
+    "revision-equipement": "Révision équipement",
+    
+    // Owner
+    "dossier-proprietaire": "Dossier propriétaire",
+    "banque": "Banque",
+    "solicitation-proprietaire": "Solicitation propriétaire",
+    
+    // Banking
+    "demande-administratif": "Demande administratif",
+    "payment": "Paiement",
+    "assurance": "Assurance",
+    
+    // Incident
+    "water-damage": "Dégât des eaux",
+    "heating-electricity": "Chauffage/Électricité",
+    "security-access": "Sécurité/Accès",
+    "maintenance-repairs": "Maintenance/Réparations"
+  };
+  
+  return labels[type] || type;
 };
 
 export default Notifications;
