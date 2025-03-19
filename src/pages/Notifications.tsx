@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { 
@@ -27,7 +26,15 @@ import {
   MessageSquare,
   ClipboardList,
   Shield,
-  Eye
+  Eye,
+  Droplet,
+  Flame,
+  Thermometer,
+  Lock,
+  Lightbulb,
+  Plug,
+  Receipt,
+  PaintBucket
 } from "lucide-react";
 
 const Notifications = () => {
@@ -39,7 +46,6 @@ const Notifications = () => {
     incident: "all"
   });
 
-  // Tenant notifications by type
   const tenantNotifications = {
     "rental-file": [
       { 
@@ -115,7 +121,6 @@ const Notifications = () => {
     ]
   };
 
-  // Owner notifications by type
   const ownerNotifications = {
     "owner-file": [
       { 
@@ -173,7 +178,6 @@ const Notifications = () => {
     ]
   };
 
-  // Banking/Insurance notifications by type
   const bankingNotifications = {
     "administrative-request": [
       { 
@@ -231,33 +235,112 @@ const Notifications = () => {
     ]
   };
 
-  // Incident notifications
-  const incidentNotifications = [
-    { 
-      id: 1, 
-      title: "Dégât des eaux signalé", 
-      description: "Un dégât des eaux a été signalé au 123 Rue de Paris, 2ème étage.",
-      time: "Il y a 30 minutes",
-      type: "error",
-      read: false
-    },
-    { 
-      id: 2, 
-      title: "Intervention programmée", 
-      description: "Un plombier interviendra demain entre 9h et 11h pour réparer la fuite.",
-      time: "Il y a 2 heures",
-      type: "warning",
-      read: false
-    },
-    { 
-      id: 3, 
-      title: "Incident résolu", 
-      description: "Le problème électrique au 45 Avenue Victor Hugo a été résolu.",
-      time: "Il y a 5 jours",
-      type: "success",
-      read: true
-    },
-  ];
+  const incidentNotifications = {
+    "water-damage": [
+      { 
+        id: 1, 
+        title: "Dégât des eaux signalé", 
+        description: "Un dégât des eaux a été signalé au 123 Rue de Paris, 2ème étage. Infiltration au niveau du plafond de la salle de bain.",
+        time: "Il y a 30 minutes",
+        type: "error",
+        read: false
+      },
+      { 
+        id: 2, 
+        title: "Intervention programmée", 
+        description: "Un plombier interviendra demain entre 9h et 11h pour réparer la fuite au 123 Rue de Paris.",
+        time: "Il y a 2 heures",
+        type: "warning",
+        read: false
+      },
+      { 
+        id: 3, 
+        title: "Rapport d'assurance requis", 
+        description: "L'expert en assurance demande des photos supplémentaires du dégât des eaux au 123 Rue de Paris.",
+        time: "Il y a 1 jour",
+        type: "info",
+        read: true
+      },
+    ],
+    "heating-electricity": [
+      { 
+        id: 4, 
+        title: "Panne de chauffage", 
+        description: "Le locataire du 45 Avenue Victor Hugo signale que le chauffage ne fonctionne plus depuis hier soir.",
+        time: "Il y a 3 heures",
+        type: "error",
+        read: false
+      },
+      { 
+        id: 5, 
+        title: "Problème électrique résolu", 
+        description: "Le problème électrique au 45 Avenue Victor Hugo a été résolu. Remplacement du disjoncteur effectué.",
+        time: "Il y a 5 jours",
+        type: "success",
+        read: true
+      },
+      { 
+        id: 6, 
+        title: "Maintenance annuelle chaudière", 
+        description: "Rappel: La maintenance annuelle de la chaudière du 8 Boulevard des Capucines est à programmer avant fin du mois.",
+        time: "Il y a 2 jours",
+        type: "warning",
+        read: true
+      },
+    ],
+    "security-access": [
+      { 
+        id: 7, 
+        title: "Serrure défectueuse", 
+        description: "Le locataire du 123 Rue de Paris signale un problème avec la serrure de la porte d'entrée.",
+        time: "Il y a 4 heures",
+        type: "warning",
+        read: false
+      },
+      { 
+        id: 8, 
+        title: "Intrusion signalée", 
+        description: "Une tentative d'intrusion a été signalée dans l'immeuble au 45 Avenue Victor Hugo. Vérification des caméras en cours.",
+        time: "Il y a 1 jour",
+        type: "error",
+        read: false
+      },
+      { 
+        id: 9, 
+        title: "Changement de codes", 
+        description: "Les codes d'accès de l'immeuble au 8 Boulevard des Capucines seront changés demain. Informez tous les locataires.",
+        time: "Il y a 3 jours",
+        type: "info",
+        read: true
+      },
+    ],
+    "maintenance-repairs": [
+      { 
+        id: 10, 
+        title: "Demande de réparation", 
+        description: "Le locataire du 8 Boulevard des Capucines signale une moisissure persistante dans la salle de bain.",
+        time: "Il y a 1 jour",
+        type: "warning",
+        read: false
+      },
+      { 
+        id: 11, 
+        title: "Rénovation planifiée", 
+        description: "La rénovation des parties communes au 123 Rue de Paris débutera le 15 du mois prochain.",
+        time: "Il y a 3 jours",
+        type: "info",
+        read: true
+      },
+      { 
+        id: 12, 
+        title: "Intervention terminée", 
+        description: "La réparation des volets au 45 Avenue Victor Hugo est terminée. Facture disponible dans l'espace propriétaire.",
+        time: "Il y a 6 jours",
+        type: "success",
+        read: true
+      },
+    ]
+  };
 
   const renderIcon = (type) => {
     switch (type) {
@@ -308,6 +391,19 @@ const Notifications = () => {
           return <Shield className="h-5 w-5 text-purple-500" />;
         default:
           return <Bell className="h-5 w-5 text-blue-500" />;
+      }
+    } else if (category === "incident") {
+      switch (type) {
+        case "water-damage":
+          return <Droplet className="h-5 w-5 text-blue-500" />;
+        case "heating-electricity":
+          return <Thermometer className="h-5 w-5 text-orange-500" />;
+        case "security-access":
+          return <Lock className="h-5 w-5 text-red-500" />;
+        case "maintenance-repairs":
+          return <Wrench className="h-5 w-5 text-purple-500" />;
+        default:
+          return <AlertTriangle className="h-5 w-5 text-red-500" />;
       }
     }
     return <Bell className="h-5 w-5 text-blue-500" />;
@@ -459,6 +555,50 @@ const Notifications = () => {
     </div>
   );
 
+  const getIncidentFilters = () => (
+    <div className="flex flex-wrap gap-2 mb-4">
+      <Button 
+        variant={notificationFilters.incident === "all" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "all"})}
+      >
+        Tous
+      </Button>
+      <Button 
+        variant={notificationFilters.incident === "water-damage" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "water-damage"})}
+        className="flex items-center gap-1"
+      >
+        <Droplet className="h-4 w-4" /> Dégât des eaux
+      </Button>
+      <Button 
+        variant={notificationFilters.incident === "heating-electricity" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "heating-electricity"})}
+        className="flex items-center gap-1"
+      >
+        <Thermometer className="h-4 w-4" /> Chauffage/Électricité
+      </Button>
+      <Button 
+        variant={notificationFilters.incident === "security-access" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "security-access"})}
+        className="flex items-center gap-1"
+      >
+        <Lock className="h-4 w-4" /> Sécurité/Accès
+      </Button>
+      <Button 
+        variant={notificationFilters.incident === "maintenance-repairs" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setNotificationFilters({...notificationFilters, incident: "maintenance-repairs"})}
+        className="flex items-center gap-1"
+      >
+        <Wrench className="h-4 w-4" /> Entretien/Réparations
+      </Button>
+    </div>
+  );
+
   const getFilteredTenantNotifications = () => {
     if (notificationFilters.tenant === "all") {
       return [
@@ -496,6 +636,19 @@ const Notifications = () => {
     }
   };
 
+  const getFilteredIncidentNotifications = () => {
+    if (notificationFilters.incident === "all") {
+      return [
+        ...incidentNotifications["water-damage"],
+        ...incidentNotifications["heating-electricity"],
+        ...incidentNotifications["security-access"],
+        ...incidentNotifications["maintenance-repairs"]
+      ];
+    } else {
+      return incidentNotifications[notificationFilters.incident] || [];
+    }
+  };
+
   const getNotificationTypeLabel = (category, item) => {
     if (category === "tenant") {
       if (tenantNotifications["rental-file"].find(n => n.id === item.id)) return "Dossier locatif";
@@ -510,6 +663,11 @@ const Notifications = () => {
       if (bankingNotifications["administrative-request"].find(n => n.id === item.id)) return "Demande administrative";
       if (bankingNotifications["payment"].find(n => n.id === item.id)) return "Paiement";
       if (bankingNotifications["insurance"].find(n => n.id === item.id)) return "Assurance";
+    } else if (category === "incident") {
+      if (incidentNotifications["water-damage"].find(n => n.id === item.id)) return "Dégât des eaux";
+      if (incidentNotifications["heating-electricity"].find(n => n.id === item.id)) return "Chauffage/Électricité";
+      if (incidentNotifications["security-access"].find(n => n.id === item.id)) return "Sécurité/Accès";
+      if (incidentNotifications["maintenance-repairs"].find(n => n.id === item.id)) return "Entretien/Réparations";
     }
     return "";
   };
@@ -538,6 +696,15 @@ const Notifications = () => {
         return getNotificationTypeIcon("banking", "payment");
       if (bankingNotifications["insurance"].find(n => n.id === item.id)) 
         return getNotificationTypeIcon("banking", "insurance");
+    } else if (category === "incident") {
+      if (incidentNotifications["water-damage"].find(n => n.id === item.id)) 
+        return getNotificationTypeIcon("incident", "water-damage");
+      if (incidentNotifications["heating-electricity"].find(n => n.id === item.id)) 
+        return getNotificationTypeIcon("incident", "heating-electricity");
+      if (incidentNotifications["security-access"].find(n => n.id === item.id)) 
+        return getNotificationTypeIcon("incident", "security-access");
+      if (incidentNotifications["maintenance-repairs"].find(n => n.id === item.id)) 
+        return getNotificationTypeIcon("incident", "maintenance-repairs");
     }
     return renderIcon(item.type);
   };
@@ -550,7 +717,7 @@ const Notifications = () => {
     } else if (category === "banking") {
       return getFilteredBankingNotifications().filter(n => !n.read).length;
     } else if (category === "incident") {
-      return incidentNotifications.filter(n => !n.read).length;
+      return getFilteredIncidentNotifications().filter(n => !n.read).length;
     }
     return 0;
   };
@@ -596,7 +763,7 @@ const Notifications = () => {
               <AlertTriangle className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Incident</span>
               <Badge className="ml-2 bg-blue-500" variant="default">
-                {incidentNotifications.filter(n => !n.read).length}
+                {getFilteredIncidentNotifications().filter(n => !n.read).length}
               </Badge>
             </TabsTrigger>
           </TabsList>
@@ -759,18 +926,20 @@ const Notifications = () => {
                   <CardTitle>Notifications {getTabTitle("incident")}</CardTitle>
                 </div>
                 <CardDescription>
-                  {incidentNotifications.length} notifications, dont {countUnreadNotifications("incident")} non lues
+                  {getFilteredIncidentNotifications().length} notifications, dont {countUnreadNotifications("incident")} non lues
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {incidentNotifications.map((notification) => (
+                {getIncidentFilters()}
+                
+                {getFilteredIncidentNotifications().map((notification) => (
                   <div 
                     key={notification.id} 
                     className={`flex items-start justify-between p-4 border rounded-lg ${notification.read ? 'bg-white' : 'bg-blue-50'}`}
                   >
                     <div className="flex gap-4">
                       <div className="mt-1">
-                        {renderIcon(notification.type)}
+                        {getNotificationIcon("incident", notification)}
                       </div>
                       <div>
                         <div className="flex items-center">
